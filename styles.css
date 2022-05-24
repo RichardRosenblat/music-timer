@@ -1,0 +1,44 @@
+.buttons-div{
+    padding-top: 10px;
+}
+
+.hidden{
+    display: none;
+}
+
+.footer{
+    text-align: right;
+    position: fixed;
+    right: 0%;
+    bottom: 0;
+}
+
+body{
+    background-color: #bcdddf;
+}
+
+.main{
+    zoom:150%;
+    margin-top: 10%;
+    background-color: #a8c2c3;
+    border: 3px solid #5f859e;
+
+}
+
+.help_text{
+    border-radius: 25px;
+    border: 3px solid #7291a5;
+    color: #d0e2e2;
+    text-align: left;
+    background-color: #696969;
+    padding: 10%;
+}
+
+.btn-border{
+    border: 2px solid #c2c2c2;
+}
+
+#lock_image{
+    width:20px;
+    height:20px;
+}

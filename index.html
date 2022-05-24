@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music timer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
+</head>
+
+<body onkeydown="recieveInput(event)" ">
+    <div class=" main">
+    <div class=" text-center">
+        <div class="d-flex justify-content-center m-4">
+            <h1 id="display_hours" class="hidden">00</h1>
+            <h1 id="display_secret" class="mx-1 hidden">:</h1>
+            <h1 id="display_minutes">00</h1>
+            <h1 id="display" class="mx-1">:</h1>
+            <h1 id="display_seconds">00</h1>
+            <img src="assets/lock.png" id="lock_image" title="Display is locked for entering number from keyboard"
+                alt="Display is locked for entering number from keyboard" class="hidden">
+        </div>
+        <button type="button" id="start" class="btn btn-primary mx-1" onclick="start_pause_resume()">Start</button>
+        <button type="button" id="clear" class="btn btn-danger mx-1" onclick="changeStatesTo('idle')">Clear</button>
+    </div>
+    <div class="text-center buttons-div py-2">
+        <div class="d-flex justify-content-center m-4">
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-10)">-10m</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-5)">-5m</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-1)">-1m</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterSeconds(-30)">-30s</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterSeconds(30)">+30s</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(1)">+1m</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(5)">+5m</button>
+            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(10)">+10m</button>
+        </div>
+    </div>
+    </div>
+    <div class="footer">
+        <p id="help_text" class="help_text text-sm hidden mx-4">
+            <b>Lock symbol :</b> Display is locked for entering number from keyboard<br>
+            <br>
+            <b>ArrowUp :</b> Add 30 seconds<br>
+            <b>ArrowDown :</b> Minus 30 seconds<br>
+            <b>ArrowRight :</b> Add 1 minute<br>
+            <b>ArrowLeft :</b> Minus 1 minute<br>
+            <b>PageUp :</b> Add 5 minutes<br>
+            <b>PageDown :</b> Minus 5 minutes<br>
+            <b>Home :</b> Add 10 minutes<br>
+            <b>End :</b> Minus 10 minutes<br>
+            <b>Enter :</b> Start/Pause<br>
+            <b>Delete :</b> Stop/Clear<br>
+            <br>
+            <b>w :</b> Add 30 seconds<br>
+            <b>s :</b> Minus 30 seconds<br>
+            <b>d :</b> Add 1 minute<br>
+            <b>a :</b> Minus 1 minute<br>
+            <b>e :</b> Add 5 minutes<br>
+            <b>q :</b> Minus 5 minutes<br>
+            <b>r :</b> Add 10 minutes<br>
+            <b>f :</b> Minus 10 minutes<br>
+            <b>Space :</b> Start/Pause<br>
+            <b>Esc :</b> Stop/Clear<br>
+        </p>
+        <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="showHelp()">?</button>
+    </div>
+</body>
+
+</html>
