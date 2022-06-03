@@ -12,33 +12,55 @@
     <script src="script.js"></script>
 </head>
 
-<body onkeydown="recieveInput(event)" ">
-    <div class=" main">
-    <div class=" text-center">
-        <div class="d-flex justify-content-center m-4">
-            <h1 id="display_hours" class="hidden">00</h1>
-            <h1 id="display_secret" class="mx-1 hidden">:</h1>
-            <h1 id="display_minutes">00</h1>
-            <h1 id="display" class="mx-1">:</h1>
-            <h1 id="display_seconds">00</h1>
-            <img src="assets/lock.png" id="lock_image" title="Display is locked for entering number from keyboard"
-                alt="Display is locked for entering number from keyboard" class="hidden">
+<body onkeydown="recieveInput(event)">
+    <div class="main">
+        <div class="text-center">
+            <div class="d-flex justify-content-center m-4">
+                <h1 id="display_hours" class="hidden">00</h1>
+                <h1 id="display_secret" class="mx-1 hidden">:</h1>
+                <h1 id="display_minutes">00</h1>
+                <h1 id="display" class="mx-1">:</h1>
+                <h1 id="display_seconds">00</h1>
+                <img src="assets/lock.png" id="lock_image" title="Display is locked for entering number from keyboard"
+                    alt="Display is locked for entering number from keyboard" class="hidden">
+            </div>
+            <button type="button" id="start" class="btn btn-primary mx-1" onclick="start_pause_resume()">Start</button>
+            <button type="button" id="clear" class="btn btn-danger mx-1" onclick="changeStatesTo('idle')">Clear</button>
         </div>
-        <button type="button" id="start" class="btn btn-primary mx-1" onclick="start_pause_resume()">Start</button>
-        <button type="button" id="clear" class="btn btn-danger mx-1" onclick="changeStatesTo('idle')">Clear</button>
-    </div>
-    <div class="text-center buttons-div py-2">
-        <div class="d-flex justify-content-center m-4">
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-10)">-10m</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-5)">-5m</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-1)">-1m</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterSeconds(-30)">-30s</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterSeconds(30)">+30s</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(1)">+1m</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(5)">+5m</button>
-            <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(10)">+10m</button>
+        <div class="text-center buttons-div py-2">
+            <div class="d-flex justify-content-center m-4">
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="alterMinutes(-10)">-10m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-5)">-5m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-1)">-1m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="alterSeconds(-30)">-30s</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterSeconds(30)">+30s</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(1)">+1m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(5)">+5m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(10)">+10m</button>
+            </div>
         </div>
     </div>
+    <div class="text-center input-div">
+        <div class="input-group my-3 label">
+            <input id="link-label" type="text" class="form-control" placeholder="Youtube Link" aria-label="Youtube Link">
+            <div class="input-group-append">
+                <button class="corners-pont-round btn btn-success" onclick="setVideo()" type="button">Find</button>
+            </div>
+        </div>
+        <div class="justify-content-center m-4">
+
+            <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
+        
+            <iframe class="" id="player" width="400" height="225" 
+                src="" 
+                title="Video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+            
+        </div>
     </div>
     <div class="footer">
         <p id="help_text" class="help_text text-sm hidden mx-4">

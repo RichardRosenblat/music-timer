@@ -40,6 +40,7 @@ function changeStatesTo(state) {
             unlockDisplayForKeyboard();
             stopTimer();
             clearTimer();
+            setDefaultTitle();
             ApplicationState = "idle";
         },
         "playing": function () {
@@ -58,6 +59,7 @@ function changeStatesTo(state) {
     };
     States[state]();
     blurButtons();
+    updateDisplays();
 
 
     function startTimer(){
@@ -65,7 +67,7 @@ function changeStatesTo(state) {
             if(--RemainingTime < 0){
                 changeStatesTo("idle");
             }
-            updateDisplay();
+            updateDisplays();
         }, 1000);
     }
     function stopTimer(){
@@ -96,6 +98,10 @@ function changeStatesTo(state) {
     function blurButtons() {
         startButton.blur();
         clearButton.blur();
+    }
+
+    function setDefaultTitle() {
+        document.querySelector('title').textContent = 'Music Timer';
     }
 
     function unlockDisplayForKeyboard() {
@@ -187,7 +193,7 @@ function recieveInput(e) {
     
             RemainingTime=(hours*3600)+(minutes*60)+seconds;
             
-            updateDisplay();
+            updateDisplays();
         }
     }
 }
@@ -202,10 +208,10 @@ function alterSeconds(value) {
     else {
         RemainingTime += value;
     }
-    updateDisplay();
+    updateDisplays();
 }
 
-function updateDisplay() {
+function updateDisplays() {
     
     let hours = parseInt(RemainingTime / 3600, 10);
     let minutes = parseInt((RemainingTime / 60) % 60, 10);
@@ -218,19 +224,103 @@ function updateDisplay() {
     const display_seconds = document.getElementById("display_seconds");
 
     if (hours != 0) {
-        display_secret.classList.remove("hidden");
-        display_hours.classList.remove("hidden");
+        showHour_display();
     }
     else{
+        hideHour_display();
+    }
+    
+    updatePageDisplay();
+    updateTitleDisplay()
+
+    function hideHour_display() {
         display_hours.classList.add("hidden");
         display_secret.classList.add("hidden");
     }
-    
-    display_hours.innerHTML = hours < 10 ? "0" + hours : hours;
-    display_minutes.innerHTML = minutes < 10 ? "0" + minutes : minutes;
-    display_seconds.innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
+    function showHour_display() {
+        display_secret.classList.remove("hidden");
+        display_hours.classList.remove("hidden");
+    }
+
+    function updatePageDisplay() {
+        display_hours.innerHTML = hours < 10 ? "0" + hours : hours;
+        display_minutes.innerHTML = minutes < 10 ? "0" + minutes : minutes;
+        display_seconds.innerHTML = seconds < 10 ? "0" + seconds : seconds;
+    }
+
+    function updateTitleDisplay() {
+        if (ApplicationState == 'idle') {
+            return;
+        }
+        let newTitle =  "Music Timer (" +
+                        (hours <= 0 ? "" : display_hours.innerHTML + ":") +
+                        display_minutes.innerHTML + ":" + 
+                        display_seconds.innerHTML + ')';
+
+        document.querySelector('title').textContent = newTitle;
+    }
 }
 
 function showHelp(){
     document.getElementById("help_text").classList.toggle("hidden");
 }
+
+function setVideo() {
+    let link = document.getElementById("link-label").value;
+    let id = getVideoId(link);
+    let player = document.getElementById("player")
+    let invalidVideoAlert = document.getElementById("invalid_video")
+
+    isVideoIdValid(id,
+        () => {
+            invalidVideoAlert.classList.add("hidden")
+            player.src=buildEmbedURL(id);
+        },
+        () => {
+            invalidVideoAlert.classList.remove("hidden")
+        }
+    );
+
+    function getVideoId(link) {
+        if (link.includes("https://www.youtube.com")) {
+            if (link.includes("start_radio")||link.includes("index")) {
+                return "000";
+            }
+            if (link.includes("playlist?")) {
+                return "000";
+            }
+            if (link.includes("watch?")) {
+                return link.substring(link.indexOf("=")+1);
+            }
+        }
+        if (link.includes("https://youtu.be/")) {
+            return link.substring(link.indexOf("/",8)+1)
+        }
+        return link;
+    }
+    
+    function isVideoIdValid(id,callback,fail) {
+		var img = new Image();
+
+		img.src = "http://img.youtube.com/vi/" + id + "/mqdefault.jpg";
+		img.onload = function () {
+            if (this.width === 120) {
+                fail();
+                return;
+            } 
+            callback();
+		}
+
+	}
+
+    function buildEmbedURL(id) {
+        return "https://www.youtube.com/embed/"+id;
+    }
+}
+
+
+// Add "?&autoplay=1" to autoplay embeded youtube video
+// https://www.youtube.com/embed/[CODE] = https://www.youtube.com/watch?v=
+// https://www.youtube.com/embed/pXRviuL6vMY
+// https://www.youtube.com/embed/videoseries?list=[CODE] = https://www.youtube.com/playlist?list=[CODE]
