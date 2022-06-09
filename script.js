@@ -279,6 +279,9 @@ function setVideo() {
         },
         () => {
             invalidVideoAlert.classList.remove("hidden")
+            setTimeout(function() {
+                invalidVideoAlert.classList.add("hidden")
+              }, 6000);
         }
     );
 
