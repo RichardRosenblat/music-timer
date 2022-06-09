@@ -130,7 +130,13 @@ function isDisplayLocked() {
 
 function recieveInput(e) {
     const key = e.key;
-
+    console.log(key);
+    if (document.getElementById("link-label")===document.activeElement) {
+        if (key =="Enter") {
+            setVideo();
+        }
+        return;
+    }
 
     try {
         keyboardShortcuts[key]();
