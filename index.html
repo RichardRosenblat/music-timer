@@ -12,7 +12,7 @@
     <script src="script.js"></script>
 </head>
 
-<body onkeydown="recieveInput(event)">
+<body onkeydown="Input.recieveInput(event)">
     <div class="main">
         <div class="text-center">
             <div class="d-flex justify-content-center m-4">
@@ -24,21 +24,19 @@
                 <img src="assets/lock.png" id="lock_image" title="Display is locked for entering number from keyboard"
                     alt="Display is locked for entering number from keyboard" class="hidden">
             </div>
-            <button type="button" id="start" class="btn btn-primary mx-1" onclick="start_pause_resume()">Start</button>
-            <button type="button" id="clear" class="btn btn-danger mx-1" onclick="changeStatesTo('idle')">Clear</button>
+            <button type="button" id="start" class="btn btn-primary mx-1" onclick="States.cycleStates()">Start</button>
+            <button type="button" id="clear" class="btn btn-danger mx-1" onclick="States.changeStatesTo('idle')">Clear</button>
         </div>
         <div class="text-center buttons-div py-2">
             <div class="d-flex justify-content-center m-4">
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="alterMinutes(-10)">-10m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-5)">-5m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(-1)">-1m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="alterSeconds(-30)">-30s</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterSeconds(30)">+30s</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(1)">+1m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(5)">+5m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="alterMinutes(10)">+10m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(-10)">-10m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(-5)">-5m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(-1)">-1m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterSeconds(-30)">-30s</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterSeconds(30)">+30s</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(1)">+1m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(5)">+5m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(10)">+10m</button>
             </div>
         </div>
     </div>
@@ -46,7 +44,7 @@
         <div class="input-group my-3 label">
             <input id="link-label" type="text" class="form-control" placeholder="Youtube Link" aria-label="Youtube Link">
             <div class="input-group-append">
-                <button class="corners-pont-round btn btn-success" onclick="setVideo()" type="button">Set</button>
+                <button class="corners-pont-round btn btn-success" onclick="Video.setVideo()" type="button">Set</button>
             </div>
         </div>
         <div class="justify-content-center m-4">
@@ -88,7 +86,7 @@
             <b>Space :</b> Start/Pause<br>
             <b>Esc :</b> Stop/Clear<br>
         </p>
-        <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="showHelp()">?</button>
+        <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="Help.toggleHelp()">?</button>
     </div>
 </body>
 
