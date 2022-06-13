@@ -12,7 +12,7 @@
     <script src="script.js"></script>
 </head>
 
-<body onkeydown="Input.recieveInput(event)">
+<body onkeydown="Input.recieveInput(event)" onload="Application.load()">
     <div class="main">
         <div class="text-center">
             <div class="d-flex justify-content-center m-4">
@@ -48,15 +48,9 @@
             </div>
         </div>
         <div class="justify-content-center m-4">
-
             <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
-        
-            <iframe class="" id="player" width="400" height="225" 
-                src="" 
-                title="Video player" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-            </iframe>
+            
+            <div id="player" class="test my-4"></div>
             
         </div>
     </div>

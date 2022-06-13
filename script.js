@@ -1,10 +1,22 @@
 var ApplicationState = "idle";
 
 var RemainingTime = 0;
+var Player;
 
 var TimerId;
 
-
+function onYouTubeIframeAPIReady() {
+    Video.loadPlayer();
+}
+class Application {
+    static load(){
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
+    }
+}
 
 
 class States {
@@ -48,7 +60,7 @@ class States {
     }
 }
 
-class Buttons{
+class Buttons {
     static setStartButton(){
         document.getElementById("start").innerHTML = "Start";
         document.getElementById("start").classList.add("btn-primary");
@@ -73,7 +85,7 @@ class Buttons{
     }
 }
 
-class Input{
+class Input {
 
     static recieveInput(e) {
         const keyboardShortcuts = {
@@ -176,7 +188,7 @@ class Input{
     }
 }
 
-class Time{
+class Time {
     static alterMinutes(value) {
         this.alterSeconds(value * 60);
     }
@@ -206,7 +218,7 @@ class Time{
     } 
 }
 
-class Display{
+class Display {
     
     static updateDisplays() {
         
@@ -276,13 +288,32 @@ class Display{
     }
 }
 
-class Help{
+class Help {
     static toggleHelp(){
         document.getElementById("help_text").classList.toggle("hidden");
     }
 }
 
-class Video{
+class Video {
+    static loadPlayer() {
+        Player = new YT.Player('player', {
+            height: '360',
+            width: '640',
+            videoId: '5LCvj6Z_LrA'
+        });
+    }
+
+    static playVideo(){
+        Player.playVideo();
+    }
+    
+    static stopVideo(){
+        Player.stopVideo();
+    }
+    static pauseVideo(){
+        Player.pauseVideo();
+    }
+
     static setVideo() {
         let link = document.getElementById("link-label").value;
         let id = getVideoId(link);
