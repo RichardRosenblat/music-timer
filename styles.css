@@ -20,7 +20,7 @@ body{
 
 .main{
     zoom:150%;
-    margin-top: 10%;
+    margin-top: 2%;
     background-color: #a8c2c3;
     border: 3px solid #5f859e;
 
@@ -62,8 +62,4 @@ body{
 
 .label{
     zoom:125%;
-}
-
-.test{
-    border: 2px solid #dd1526;
 }
