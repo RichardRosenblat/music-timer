@@ -18,7 +18,6 @@ class Application {
     }
 }
 
-
 class States {
     static changeStatesTo(state) {
     
@@ -102,6 +101,7 @@ class Input {
             "End": function () {Time.alterMinutes(-10)},
             "Enter": function () {States.cycleStates()},
             "Delete": function () {States.changeStatesTo("idle")},
+            " ": function () {States.cycleStates()},
             
             "d": function () {Time.alterSeconds(30)},
             "a": function () {Time.alterSeconds(-30)},
@@ -115,6 +115,8 @@ class Input {
         };
 
         const key = e.key;
+
+        console.log(key);
 
         if (document.getElementById("link-label")===document.activeElement) {
             if (key =="Enter") {
