@@ -28,6 +28,7 @@ class States {
                 Display.unlockDisplayForKeyboard();
                 Time.stopTimer();
                 Time.clearTimer();
+                Video.pauseVideo();
                 Display.setDefaultTitle();
                 ApplicationState = "idle";
             },
@@ -35,12 +36,14 @@ class States {
                 Buttons.setPauseButton();
                 Display.lockDisplayForKeyboard();
                 Time.startTimer();
+                Video.playVideo()
                 ApplicationState = "playing";
             },
             "paused": function () {
                 Buttons.setResumeButton();
                 Display.unlockDisplayForKeyboard();
                 Time.stopTimer();
+                Video.pauseVideo();
                 ApplicationState = "paused";
             }
         
@@ -52,9 +55,9 @@ class States {
 
     static cycleStates() {
         const stateChange = {
-            "idle": function () {changeStatesTo("playing")},
-            "playing": function () {changeStatesTo("paused")},
-            "paused": function () {changeStatesTo("playing")}
+            "idle": function () {States.changeStatesTo("playing")},
+            "playing": function () {States.changeStatesTo("paused")},
+            "paused": function () {States.changeStatesTo("playing")}
         };
        stateChange[ApplicationState]();
     }
@@ -98,7 +101,7 @@ class Input {
             "Home": function () {Time.alterMinutes(10)},
             "End": function () {Time.alterMinutes(-10)},
             "Enter": function () {States.cycleStates()},
-            "Delete": function () {changeStatesTo("idle")},
+            "Delete": function () {States.changeStatesTo("idle")},
             
             "d": function () {Time.alterSeconds(30)},
             "a": function () {Time.alterSeconds(-30)},
@@ -108,8 +111,7 @@ class Input {
             "q": function () {Time.alterMinutes(-5)},
             "r": function () {Time.alterMinutes(10)},
             "f": function () {Time.alterMinutes(-10)},
-            " ": function () {States.cycleStates()},
-            "Escape": function () {changeStatesTo("idle")},
+            "Escape": function () {States.changeStatesTo("idle")},
         };
 
         const key = e.key;
@@ -205,7 +207,7 @@ class Time {
     static startTimer(){
         TimerId = setInterval(() => {
             if(--RemainingTime < 0){
-                changeStatesTo("idle");
+                States.changeStatesTo("idle");
             }
             Display.updateDisplays();
         }, 1000);
@@ -299,14 +301,13 @@ class Video {
         Player = new YT.Player('player', {
             height: '360',
             width: '640',
-            videoId: '5LCvj6Z_LrA'
+            videoId: 'x7SQaDTSrVg'
         });
     }
 
     static playVideo(){
         Player.playVideo();
     }
-    
     static stopVideo(){
         Player.stopVideo();
     }
