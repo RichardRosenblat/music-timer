@@ -341,23 +341,22 @@ class Display {
         const invalidVideoAlert = document.getElementById("invalid_video")
         invalidVideoAlert.classList.remove("hidden")
         setTimeout(function () {
-            // invalidVideoAlert.classList.add("hidden")
             Display.hideInvalidVideoError();
         }, 500);
     }
 
-    static hideInvalidVideoError() {       
-        document.getElementById("invalid_video").classList.add("hidden")        
+    static hideInvalidVideoError() {
+        document.getElementById("invalid_video").classList.add("hidden")
     }
 
-    static clearLinkLabel(){
+    static clearLinkLabel() {
         document.getElementById("link-label").value = "";
     }
-    
-    static hidePlayer(){
+
+    static hidePlayer() {
         document.getElementById("player").classList.remove("hidden")
     }
-    static showPlayer(){
+    static showPlayer() {
         document.getElementById("player").classList.remove("hidden")
     }
 }
@@ -395,17 +394,17 @@ class Video {
         const linkTypes = {
             "single": function () {
                 Display.showPlayer();
-                console.log("Loading single video: "+id);
                 Player.loadVideoById(id);
                 Display.hideInvalidVideoError()
             },
             "playlist": function () {
                 Display.showPlayer();
-                console.log("Loading playlist: "+id);
-                // Player.loadPlaylist(id,index);
-                // Player.loadPlaylist("PLAZNU5fM7FIC4ruXQhKjpuvP0AByhc0bl",1);
-                alert("PLAYLIST DETECTED")
-                Display.hideInvalidVideoError()
+                Player.loadPlaylist({
+                    list: id,
+                    listType: "playlist",
+                    index: index
+                });
+                Display.hideInvalidVideoError();
             },
             "invalid": function () {
                 Display.showInvalidVideoError();
@@ -422,7 +421,7 @@ class Video {
                 // If link is from a video in a given playlist
                 if (link.includes("index")) {
                     linkType = "playlist"
-                    index = link.split("index=").pop();
+                    index = parseInt(link.split("index=").pop()) - 1;
                     return link.split("list=").pop().split("&").shift();
                 }
 
@@ -443,13 +442,20 @@ class Video {
             }
 
         }
-      
+
 
         linkTypes[linkType]();
-        
+
+
+        let videoStateChecker = setInterval(() => {
+            if (ApplicationState != 'playing'  && Player.getPlayerState() === 1) {
+                Video.stopVideo();
+                clearInterval(videoStateChecker);
+            }
+        }, 10);
+
         Display.clearLinkLabel();
-        Video.stopVideo();
-        
+
     }
 
 }
