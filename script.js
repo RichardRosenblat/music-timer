@@ -342,9 +342,8 @@ class Display {
         invalidVideoAlert.classList.remove("hidden")
         setTimeout(function () {
             Display.hideInvalidVideoError();
-        }, 500);
+        }, 1000);
     }
-
     static hideInvalidVideoError() {
         document.getElementById("invalid_video").classList.add("hidden")
     }
@@ -354,7 +353,7 @@ class Display {
     }
 
     static hidePlayer() {
-        document.getElementById("player").classList.remove("hidden")
+        document.getElementById("player").classList.add("hidden")
     }
     static showPlayer() {
         document.getElementById("player").classList.remove("hidden")
@@ -418,25 +417,25 @@ class Video {
 
             if (link.includes("https://www.youtube.com") || link.includes("https://youtu.be/")) {
 
-                // If link is from a video in a given playlist
+
                 if (link.includes("index")) {
                     linkType = "playlist"
                     index = parseInt(link.split("index=").pop()) - 1;
                     return link.split("list=").pop().split("&").shift();
                 }
 
-                // If link is of a playlist without a specific video
+
                 if (link.includes("playlist?")) {
                     linkType = "playlist";
                     return link.split("list=").pop();
                 }
 
-                // If link is of a single video
+
                 if (link.includes("watch?")) {
                     linkType = "single";
                     return link.substring(link.indexOf("=") + 1);
                 }
-                // If link is from a video shared 
+
                 linkType = "single";
                 return link.substring(link.indexOf("/", 8) + 1);
             }
@@ -448,7 +447,7 @@ class Video {
 
 
         let videoStateChecker = setInterval(() => {
-            if (ApplicationState != 'playing'  && Player.getPlayerState() === 1) {
+            if (ApplicationState != 'playing' && Player.getPlayerState() === 1) {
                 Video.stopVideo();
                 clearInterval(videoStateChecker);
             }
@@ -458,4 +457,9 @@ class Video {
 
     }
 
+    static clearVideo() {    
+        Player.stopVideo();    
+        Player.loadVideoById("000");
+        Display.hidePlayer();
+    }
 }

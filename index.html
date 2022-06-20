@@ -10,6 +10,7 @@
         integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js"></script>
+    <link rel="icon" href="./assets/hourglass.ico">
 </head>
 
 <body onkeydown="Input.recieveInput(event)" onload="Application.load()">
@@ -43,8 +44,9 @@
     <div class="text-center input-div">
         <div class="input-group my-3 label">
             <input id="link-label" type="text" class="form-control" placeholder="Youtube Link" aria-label="Youtube Link">
-            <div class="input-group-append">
-                <button class="corners-pont-round btn btn-success" onclick="Video.setVideo()" type="button">Set</button>
+            <div class="input-group-append display-flex">
+                <button class="corners-pointy btn btn-success" onclick="Video.setVideo()" type="button">Set</button>
+                <button class="corners-tl-bl-pointy btn btn-danger" onclick="Video.clearVideo()" type="button">Clear</button>
             </div>
         </div>
         <div class="justify-content-center m-4">

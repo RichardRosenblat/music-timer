@@ -1,12 +1,12 @@
-.buttons-div{
+.buttons-div {
     padding-top: 10px;
 }
 
-.hidden{
+.hidden {
     display: none;
 }
 
-.footer{
+.footer {
     text-align: right;
     position: fixed;
     right: 0%;
@@ -14,19 +14,31 @@
     z-index: 3;
 }
 
-body{
+body {
     background-color: #bcdddf;
 }
 
-.main{
-    zoom:150%;
+.main {
+    zoom: 150%;
     margin-top: 2%;
     background-color: #a8c2c3;
     border: 3px solid #5f859e;
 
 }
 
-.help_text{
+.no-margin {
+    margin: 0px 0px 0px 0px;
+}
+
+.no-padding {
+    padding: 0px 0px 0px 0px;
+}
+
+.display-flex {
+  display: flex;
+}
+
+.help_text {
     border-radius: 25px;
     border: 3px solid #7291a5;
     color: #d0e2e2;
@@ -35,31 +47,35 @@ body{
     padding: 10%;
 }
 
-.btn-border{
+.btn-border {
     border: 2px solid #c2c2c2;
 }
 
-#lock_image{
-    width:20px;
-    height:20px;
+#lock_image {
+    width: 20px;
+    height: 20px;
 }
 
-.invalid_video{
-    zoom:50%;
+.invalid_video {
+    zoom: 50%;
     border-radius: 25px;
     border: 5px solid #903139;
 }
 
-.input-div{
+.input-div {
     margin-left: 25%;
-    width:50%;
+    width: 50%;
 }
 
-.corners-pont-round{
+.corners-pointy {
+    border-radius: 0px;
+}
+
+.corners-tl-bl-pointy {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
 }
 
-.label{
-    zoom:125%;
+.label {
+    zoom: 125%;
 }
