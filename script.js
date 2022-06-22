@@ -1,3 +1,6 @@
+//working video url: https://www.youtube.com/watch?v=MkQW5xr9iGc
+//not working video url: https://youtu.be/ETEg-SB01QY
+
 var ApplicationState = "idle";
 
 var RemainingTime = 0;
@@ -358,11 +361,32 @@ class Display {
     static showPlayer() {
         document.getElementById("player").classList.remove("hidden")
     }
-}
 
-class Help {
-    static toggleHelp() {
-        document.getElementById("help_text").classList.toggle("hidden");
+    static toggleVideo(){
+        document.getElementById("player").classList.toggle("hidden");
+        Display.updateHideButton();
+    }
+
+    static updateHideButton(){
+        if(Video.hasVideoBeenSet()){
+            document.getElementById("hide_show_button").disabled = false;
+        }
+        if(document.getElementById("player").classList.contains("hidden")){
+            document.getElementById("hide_show_img").src = "./assets/show.png";
+            return;
+        }
+        document.getElementById("hide_show_img").src="./assets/hide.png";
+    }
+
+    static updateMuteButton(){
+        if(Video.hasVideoBeenSet()){
+            document.getElementById("mute_sound_button").disabled = false;
+        }
+        if (!(Video.isMuted()||Video.isMuted()== undefined)) {
+            document.getElementById("mute_sound_img").src = "./assets/volume.png";
+            return;
+        }
+        document.getElementById("mute_sound_img").src = "./assets/mute.png";
     }
 }
 
@@ -382,6 +406,24 @@ class Video {
     }
     static pauseVideo() {
         Player.pauseVideo();
+    }
+    static isMuted() {
+        return Player.isMuted();
+    }
+    
+    static toggleMute() {
+        if (Video.isMuted()){
+            Player.unMute();
+        }
+        else {
+            Player.mute();
+        }
+        Display.updateMuteButton()
+
+        
+    }
+    static hasVideoBeenSet() {
+        return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
     }
 
     static setVideo() {
@@ -454,6 +496,8 @@ class Video {
         }, 10);
 
         Display.clearLinkLabel();
+        Display.updateHideButton();
+        Display.updateMuteButton();
 
     }
 
@@ -461,5 +505,11 @@ class Video {
         Player.stopVideo();    
         Player.loadVideoById("000");
         Display.hidePlayer();
+    }
+}
+
+class Help {
+    static toggleHelp() {
+        document.getElementById("help_text").classList.toggle("hidden");
     }
 }

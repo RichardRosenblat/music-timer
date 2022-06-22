@@ -22,37 +22,50 @@
                 <h1 id="display_minutes">00</h1>
                 <h1 id="display" class="mx-1">:</h1>
                 <h1 id="display_seconds">00</h1>
-                <img src="assets/lock.png" id="lock_image" title="Display is locked for entering number from keyboard"
-                    alt="Display is locked for entering number from keyboard" class="hidden">
+                <img src="assets/lock.png" id="lock_image" class="hidden img" title="Display is locked for entering number from keyboard"
+                    alt="Display is locked for entering number from keyboard"">
             </div>
             <button type="button" id="start" class="btn btn-primary mx-1" onclick="States.cycleStates()">Start</button>
-            <button type="button" id="clear" class="btn btn-danger mx-1" onclick="States.changeStatesTo('idle')">Clear</button>
+            <button type="button" id="clear" class="btn btn-danger mx-1"
+                onclick="States.changeStatesTo('idle')">Clear</button>
         </div>
         <div class="text-center buttons-div py-2">
             <div class="d-flex justify-content-center m-4">
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(-10)">-10m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(-5)">-5m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(-1)">-1m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterSeconds(-30)">-30s</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterSeconds(30)">+30s</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(1)">+1m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(5)">+5m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border" onclick="Time.alterMinutes(10)">+10m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterMinutes(-10)">-10m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterMinutes(-5)">-5m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterMinutes(-1)">-1m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterSeconds(-30)">-30s</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterSeconds(30)">+30s</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterMinutes(1)">+1m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterMinutes(5)">+5m</button>
+                <button type="button" class="btn btn-secondary mx-2 btn-border"
+                    onclick="Time.alterMinutes(10)">+10m</button>
             </div>
         </div>
     </div>
     <div class="text-center input-div">
         <div class="input-group my-3 label">
-            <input id="link-label" type="text" class="form-control" placeholder="Youtube Link" aria-label="Youtube Link">
+            <input id="link-label" type="text" class="form-control" placeholder="Youtube Link"
+                aria-label="Youtube Link">
             <div class="input-group-append display-flex">
-                <button class="corners-pointy btn btn-success" onclick="Video.setVideo()" type="button">Set</button>
-                <button class="corners-tl-bl-pointy btn btn-danger" onclick="Video.clearVideo()" type="button">Clear</button>
+                <button class="corners-tl-bl-pointy  btn btn-success" onclick="Video.setVideo()"
+                    type="button">Set</button>
             </div>
         </div>
-        <div class="justify-content-center m-4">
+        <button class="btn btn-primary" onclick="Display.toggleVideo()" disabled id="hide_show_button" type="button"><img id="hide_show_img" class="reverse_img" src="./assets/hide.png"></img></button>
+        <button class="btn btn-primary" onclick="Video.toggleMute()" disabled id="mute_sound_button" type="button"><img id="mute_sound_img" class="reverse_img" src="./assets/mute.png"></img></button>
+        <div class="justify-content-center m-2">
             <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
-            
-            <div id="player" class="hidden my-4"></div>
+            <div id="player" class="hidden"></div>
+            <h10 class="disclaimer"> <br> Please take notice that, depending on privacy configurations, not all videos
+                are able to be embeded!</h10>
         </div>
     </div>
     <div class="footer">

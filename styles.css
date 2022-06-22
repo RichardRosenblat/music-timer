@@ -35,7 +35,7 @@ body {
 }
 
 .display-flex {
-  display: flex;
+    display: flex;
 }
 
 .help_text {
@@ -51,9 +51,15 @@ body {
     border: 2px solid #c2c2c2;
 }
 
-#lock_image {
+.img {
     width: 20px;
     height: 20px;
+}
+
+.reverse_img{
+    width: 20px;
+    height: 20px;
+    filter: invert(1);
 }
 
 .invalid_video {
@@ -78,4 +84,8 @@ body {
 
 .label {
     zoom: 125%;
+}
+
+.disclaimer {
+    color: rgb(45, 80, 77);
 }
