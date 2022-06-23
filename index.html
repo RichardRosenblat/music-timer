@@ -10,7 +10,7 @@
         integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js"></script>
-    <link rel="icon" href="./assets/hourglass.ico">
+    <link rel="icon" href="./assets/images/hourglass.ico">
 </head>
 
 <body onkeydown="Input.recieveInput(event)" onload="Application.load()">
@@ -22,7 +22,7 @@
                 <h1 id="display_minutes">00</h1>
                 <h1 id="display" class="mx-1">:</h1>
                 <h1 id="display_seconds">00</h1>
-                <img src="assets/lock.png" id="lock_image" class="hidden img" title="Display is locked for entering number from keyboard"
+                <img src="assets/images/lock.png" id="lock_image" class="hidden img" title="Display is locked for entering number from keyboard"
                     alt="Display is locked for entering number from keyboard"">
             </div>
             <button type="button" id="start" class="btn btn-primary mx-1" onclick="States.cycleStates()">Start</button>
@@ -59,8 +59,8 @@
                     type="button">Set</button>
             </div>
         </div>
-        <button class="btn btn-primary" onclick="Display.toggleVideo()" disabled id="hide_show_button" type="button"><img id="hide_show_img" class="reverse_img" src="./assets/hide.png"></img></button>
-        <button class="btn btn-primary" onclick="Video.toggleMute()" disabled id="mute_sound_button" type="button"><img id="mute_sound_img" class="reverse_img" src="./assets/mute.png"></img></button>
+        <button class="btn btn-primary" onclick="Display.toggleVideo()" disabled id="hide_show_button" type="button"><img id="hide_show_img" class="reverse_img" src="./assets/images/hide.png"></img></button>
+        <button class="btn btn-primary" onclick="Video.toggleMute()" disabled id="mute_sound_button" type="button"><img id="mute_sound_img" class="reverse_img" src="./assets/images/mute.png"></img></button>
         <div class="justify-content-center m-2">
             <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
             <div id="player" class="hidden"></div>

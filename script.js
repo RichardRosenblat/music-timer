@@ -8,16 +8,19 @@ var Player;
 
 var TimerId;
 
+var Alarm;
+
 function onYouTubeIframeAPIReady() {
     Video.loadPlayer();
 }
 class Application {
     static load() {
+        Sounds.loadAlarm() 
+
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
     }
 }
 
@@ -38,7 +41,7 @@ class States {
                 Buttons.setPauseButton();
                 Display.lockDisplayForKeyboard();
                 Time.startTimer();
-                Video.playVideo()
+                Video.playVideo();
                 ApplicationState = "playing";
             },
             "paused": function () {
@@ -246,6 +249,7 @@ class Time {
     static alterSeconds(value) {
         if (RemainingTime + value <= 0) {
             RemainingTime = 0;
+            Sounds.playAlarm();
         } else {
             RemainingTime += value;
         }
@@ -372,10 +376,10 @@ class Display {
             document.getElementById("hide_show_button").disabled = false;
         }
         if(document.getElementById("player").classList.contains("hidden")){
-            document.getElementById("hide_show_img").src = "./assets/show.png";
+            document.getElementById("hide_show_img").src = "./assets/images/show.png";
             return;
         }
-        document.getElementById("hide_show_img").src="./assets/hide.png";
+        document.getElementById("hide_show_img").src="./assets/images/hide.png";
     }
 
     static updateMuteButton(){
@@ -383,10 +387,10 @@ class Display {
             document.getElementById("mute_sound_button").disabled = false;
         }
         if (!(Video.isMuted()||Video.isMuted()== undefined)) {
-            document.getElementById("mute_sound_img").src = "./assets/volume.png";
+            document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
             return;
         }
-        document.getElementById("mute_sound_img").src = "./assets/mute.png";
+        document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
     }
 }
 
@@ -505,6 +509,16 @@ class Video {
         Player.stopVideo();    
         Player.loadVideoById("000");
         Display.hidePlayer();
+    }
+}
+
+class Sounds {
+    static loadAlarm() {
+        Alarm = new Audio('./assets/audio/ringtone.mp3');
+    }
+
+    static playAlarm(){
+        Alarm.play();
     }
 }
 
