@@ -33,6 +33,7 @@ class States {
                 Display.unlockDisplayForKeyboard();
                 Time.stopTimer();
                 Time.clearTimer();
+                Display.HideNegativeSign();
                 Video.pauseVideo();
                 Display.setDefaultTitle();
                 Display.HideOvertimeDisplay();
@@ -55,6 +56,7 @@ class States {
                 Video.playVideo();
                 Sounds.playAlarm();
                 Display.ShowOvertimeDisplay();
+                Display.ShowNegativeSign();
                 ApplicationState = "overtimed";
             },
             "paused": function () {
@@ -356,6 +358,7 @@ class Display {
                 return;
             }
             let newTitle = "Music Timer (" +
+                (Time.isTimerOvertimed() ? "-": "") +
                 (hours <= 0 ? "" : display_hours.innerHTML + ":") +
                 display_minutes.innerHTML + ":" +
                 display_seconds.innerHTML + ')';
@@ -435,6 +438,13 @@ class Display {
     }
     static hasDisplayOvertime(){
         return document.getElementById("display_div").classList.contains("overtimed")
+    }
+
+    static ShowNegativeSign() {
+        document.getElementById("display-negative").classList.remove("hidden");
+    }
+    static HideNegativeSign() {
+        document.getElementById("display-negative").classList.add("hidden");
     }
 }
 
