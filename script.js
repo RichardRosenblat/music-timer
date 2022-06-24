@@ -35,14 +35,27 @@ class States {
                 Time.clearTimer();
                 Video.pauseVideo();
                 Display.setDefaultTitle();
+                Display.HideOvertimeDisplay();
                 ApplicationState = "idle";
             },
             "playing": function () {
+                Display.HideOvertimeDisplay();
                 Buttons.setPauseButton();
                 Display.lockDisplayForKeyboard();
+                Time.stopTimer();
                 Time.startTimer();
                 Video.playVideo();
                 ApplicationState = "playing";
+            },
+            "overtimed": function () {
+                Buttons.setPauseButton();
+                Display.lockDisplayForKeyboard();
+                Time.stopTimer();
+                Time.startTimer();
+                Video.playVideo();
+                Sounds.playAlarm();
+                Display.ShowOvertimeDisplay();
+                ApplicationState = "overtimed";
             },
             "paused": function () {
                 Buttons.setResumeButton();
@@ -51,7 +64,6 @@ class States {
                 Video.pauseVideo();
                 ApplicationState = "paused";
             }
-
         };
         StatesChangeActions[state]();
         Buttons.blurButtons();
@@ -61,13 +73,21 @@ class States {
     static cycleStates() {
         const stateChange = {
             "idle": function () {
-                States.changeStatesTo("playing")
+                States.changeStatesTo("playing");
             },
             "playing": function () {
-                States.changeStatesTo("paused")
+                States.changeStatesTo("paused");
+            },
+            "overtimed": function () {
+                States.changeStatesTo("paused");
+                Display.lockDisplayForKeyboard();
             },
             "paused": function () {
-                States.changeStatesTo("playing")
+                if (Time.isTimerOvertimed()){
+                    States.changeStatesTo("overtimed");
+                    return;
+                }
+                States.changeStatesTo("playing");
             }
         };
         stateChange[ApplicationState]();
@@ -247,19 +267,31 @@ class Time {
         this.alterSeconds(value * 60);
     }
     static alterSeconds(value) {
-        if (RemainingTime + value <= 0) {
-            RemainingTime = 0;
-            Sounds.playAlarm();
+        if (ApplicationState != "overtimed") {
+            if (RemainingTime + value <= 0) {
+                RemainingTime = 0;
+            } else {
+                RemainingTime += value;
+            }
         } else {
-            RemainingTime += value;
+            if (RemainingTime - value <= 0) {
+                RemainingTime = (RemainingTime-value)*-1;
+                States.changeStatesTo("playing");
+            } else {
+                RemainingTime -= value;
+            }
         }
         Display.updateDisplays();
     }
 
     static startTimer() {
         TimerId = setInterval(() => {
-            if (--RemainingTime < 0) {
-                States.changeStatesTo("idle");
+            if (ApplicationState != "overtimed" && --RemainingTime <= 0) {            
+                Time.clearTimer();
+                States.changeStatesTo("overtimed");
+            }
+            else if (ApplicationState == "overtimed") {
+                RemainingTime++;
             }
             Display.updateDisplays();
         }, 1000);
@@ -268,7 +300,11 @@ class Time {
         clearInterval(TimerId);
     }
     static clearTimer() {
-        Time.alterSeconds(RemainingTime * -1);
+        RemainingTime = 0;
+    }
+
+    static isTimerOvertimed(){
+        return Display.hasDisplayOvertime();
     }
 }
 
@@ -370,7 +406,6 @@ class Display {
         document.getElementById("player").classList.toggle("hidden");
         Display.updateHideButton();
     }
-
     static updateHideButton(){
         if(Video.hasVideoBeenSet()){
             document.getElementById("hide_show_button").disabled = false;
@@ -381,7 +416,6 @@ class Display {
         }
         document.getElementById("hide_show_img").src="./assets/images/hide.png";
     }
-
     static updateMuteButton(){
         if(Video.hasVideoBeenSet()){
             document.getElementById("mute_sound_button").disabled = false;
@@ -391,6 +425,16 @@ class Display {
             return;
         }
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
+    }
+
+    static ShowOvertimeDisplay() {
+        document.getElementById("display_div").classList.add("overtimed");
+    }
+    static HideOvertimeDisplay() {
+        document.getElementById("display_div").classList.remove("overtimed");
+    }
+    static hasDisplayOvertime(){
+        return document.getElementById("display_div").classList.contains("overtimed")
     }
 }
 
