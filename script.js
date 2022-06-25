@@ -11,11 +11,11 @@ var TimerId;
 var Alarm;
 
 function onYouTubeIframeAPIReady() {
-    Video.loadPlayer();
+    Video.LoadPlayer();
 }
 class Application {
-    static load() {
-        Sounds.loadAlarm() 
+    static Load() {
+        Sounds.LoadAlarm() 
 
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -25,71 +25,72 @@ class Application {
 }
 
 class States {
-    static changeStatesTo(state) {
+    static ChangeStatesTo(state) {
 
         const StatesChangeActions = {
             "idle": function () {
-                Buttons.setStartButton();
-                Display.unlockDisplayForKeyboard();
-                Time.stopTimer();
-                Time.clearTimer();
+                Buttons.SetStartButton();
+                Display.UnlockDisplayForKeyboard();
+                Time.StopTimer();
+                Time.ClearTimer();
                 Display.HideNegativeSign();
-                Video.pauseVideo();
-                Display.setDefaultTitle();
+                Video.PauseVideo();
+                Display.SetDefaultTitle();
                 Display.HideOvertimeDisplay();
                 ApplicationState = "idle";
             },
             "playing": function () {
                 Display.HideOvertimeDisplay();
-                Buttons.setPauseButton();
-                Display.lockDisplayForKeyboard();
-                Time.stopTimer();
-                Time.startTimer();
-                Video.playVideo();
+                Buttons.SetPauseButton();
+                Display.LockDisplayForKeyboard();
+                Time.StopTimer();
+                Time.StartTimer();
+                Display.HideNegativeSign();
+                Video.PlayVideo();
                 ApplicationState = "playing";
             },
             "overtimed": function () {
-                Buttons.setPauseButton();
-                Display.lockDisplayForKeyboard();
-                Time.stopTimer();
-                Time.startTimer();
-                Video.playVideo();
-                Sounds.playAlarm();
+                Buttons.SetPauseButton();
+                Display.LockDisplayForKeyboard();
+                Time.StopTimer();
+                Time.StartTimer();
+                Video.PlayVideo();
+                Sounds.PlayAlarm();
                 Display.ShowOvertimeDisplay();
                 Display.ShowNegativeSign();
                 ApplicationState = "overtimed";
             },
             "paused": function () {
-                Buttons.setResumeButton();
-                Display.unlockDisplayForKeyboard();
-                Time.stopTimer();
-                Video.pauseVideo();
+                Buttons.SetResumeButton();
+                Display.UnlockDisplayForKeyboard();
+                Time.StopTimer();
+                Video.PauseVideo();
                 ApplicationState = "paused";
             }
         };
         StatesChangeActions[state]();
-        Buttons.blurButtons();
-        Display.updateDisplays();
+        Buttons.BlurButtons();
+        Display.UpdateDisplays();
     }
 
-    static cycleStates() {
+    static CycleStates() {
         const stateChange = {
             "idle": function () {
-                States.changeStatesTo("playing");
+                States.ChangeStatesTo("playing");
             },
             "playing": function () {
-                States.changeStatesTo("paused");
+                States.ChangeStatesTo("paused");
             },
             "overtimed": function () {
-                States.changeStatesTo("paused");
-                Display.lockDisplayForKeyboard();
+                States.ChangeStatesTo("paused");
+                Display.LockDisplayForKeyboard();
             },
             "paused": function () {
-                if (Time.isTimerOvertimed()){
-                    States.changeStatesTo("overtimed");
+                if (Time.IsTimerOvertimed()){
+                    States.ChangeStatesTo("overtimed");
                     return;
                 }
-                States.changeStatesTo("playing");
+                States.ChangeStatesTo("playing");
             }
         };
         stateChange[ApplicationState]();
@@ -97,25 +98,25 @@ class States {
 }
 
 class Buttons {
-    static setStartButton() {
+    static SetStartButton() {
         document.getElementById("start").innerHTML = "Start";
         document.getElementById("start").classList.add("btn-primary");
         document.getElementById("start").classList.remove("btn-success");
         document.getElementById("start").classList.remove("btn-secondary");
     }
-    static setResumeButton() {
+    static SetResumeButton() {
         document.getElementById("start").innerHTML = "Resume";
         document.getElementById("start").classList.remove("btn-primary");
         document.getElementById("start").classList.add("btn-success");
         document.getElementById("start").classList.remove("btn-secondary");
     }
-    static setPauseButton() {
+    static SetPauseButton() {
         document.getElementById("start").innerHTML = "Pause";
         document.getElementById("start").classList.remove("btn-primary");
         document.getElementById("start").classList.remove("btn-success");
         document.getElementById("start").classList.add("btn-secondary");
     }
-    static blurButtons() {
+    static BlurButtons() {
         document.getElementById("start").blur();
         document.getElementById("clear").blur();
     }
@@ -123,68 +124,68 @@ class Buttons {
 
 class Input {
 
-    static recieveInput(e) {
+    static RecieveInput(e) {
         const keyboardShortcuts = {
             "ArrowRight": function () {
-                Time.alterSeconds(30)
+                Time.AlterSeconds(30)
             },
             "ArrowLeft": function () {
-                Time.alterSeconds(-30)
+                Time.AlterSeconds(-30)
             },
             "ArrowUp": function () {
-                Time.alterMinutes(1)
+                Time.AlterMinutes(1)
             },
             "ArrowDown": function () {
-                Time.alterMinutes(-1)
+                Time.AlterMinutes(-1)
             },
             "PageUp": function () {
-                Time.alterMinutes(5)
+                Time.AlterMinutes(5)
             },
             "PageDown": function () {
-                Time.alterMinutes(-5)
+                Time.AlterMinutes(-5)
             },
             "Home": function () {
-                Time.alterMinutes(10)
+                Time.AlterMinutes(10)
             },
             "End": function () {
-                Time.alterMinutes(-10)
+                Time.AlterMinutes(-10)
             },
             "Enter": function () {
-                States.cycleStates()
+                States.CycleStates()
             },
             "Delete": function () {
-                States.changeStatesTo("idle")
+                States.ChangeStatesTo("idle")
             },
             " ": function () {
-                States.cycleStates()
+                States.CycleStates()
             },
 
             "d": function () {
-                Time.alterSeconds(30)
+                Time.AlterSeconds(30)
             },
             "a": function () {
-                Time.alterSeconds(-30)
+                Time.AlterSeconds(-30)
             },
             "w": function () {
-                Time.alterMinutes(1)
+                Time.AlterMinutes(1)
             },
             "s": function () {
-                Time.alterMinutes(-1)
+                Time.AlterMinutes(-1)
             },
             "e": function () {
-                Time.alterMinutes(5)
+                Time.AlterMinutes(5)
             },
             "q": function () {
-                Time.alterMinutes(-5)
+                Time.AlterMinutes(-5)
             },
             "r": function () {
-                Time.alterMinutes(10)
+                Time.AlterMinutes(10)
             },
             "f": function () {
-                Time.alterMinutes(-10)
+                Time.AlterMinutes(-10)
             },
             "Escape": function () {
-                States.changeStatesTo("idle")
+                States.ChangeStatesTo("idle")
             },
         };
 
@@ -206,7 +207,7 @@ class Input {
 
 
         function recieveKeyboardInput(key) {
-            if (Display.isDisplayLocked()) {
+            if (Display.IsDisplayLocked()) {
                 return;
             }
 
@@ -258,17 +259,17 @@ class Input {
 
                 RemainingTime = (hours * 3600) + (minutes * 60) + seconds;
 
-                Display.updateDisplays();
+                Display.UpdateDisplays();
             }
         }
     }
 }
 
 class Time {
-    static alterMinutes(value) {
-        this.alterSeconds(value * 60);
+    static AlterMinutes(value) {
+        this.AlterSeconds(value * 60);
     }
-    static alterSeconds(value) {
+    static AlterSeconds(value) {
         if (ApplicationState != "overtimed") {
             if (RemainingTime + value <= 0) {
                 RemainingTime = 0;
@@ -278,44 +279,44 @@ class Time {
         } else {
             if (RemainingTime - value <= 0) {
                 RemainingTime = (RemainingTime-value)*-1;
-                States.changeStatesTo("playing");
+                States.ChangeStatesTo("playing");
             } else {
                 RemainingTime -= value;
             }
         }
-        Display.updateDisplays();
+        Display.UpdateDisplays();
     }
 
-    static startTimer() {
+    static StartTimer() {
         TimerId = setInterval(() => {
             if (ApplicationState != "overtimed" && --RemainingTime <= 0) {            
-                Time.clearTimer();
-                States.changeStatesTo("overtimed");
+                Time.ClearTimer();
+                States.ChangeStatesTo("overtimed");
             }
             else if (ApplicationState == "overtimed") {
                 RemainingTime++;
             }
-            Display.updateDisplays();
+            Display.UpdateDisplays();
         }, 1000);
     }
-    static stopTimer() {
+    static StopTimer() {
         clearInterval(TimerId);
     }
-    static clearTimer() {
+    static ClearTimer() {
         RemainingTime = 0;
     }
 
-    static isTimerOvertimed(){
-        return Display.hasDisplayOvertime();
+    static IsTimerOvertimed(){
+        return Display.HasDisplayOvertime();
     }
 }
 
 class Display {
 
-    static updateDisplays() {
+    static UpdateDisplays() {
 
         if (ApplicationState == 'playing') {
-            Video.playVideo();
+            Video.PlayVideo();
         }
 
         let hours = parseInt(RemainingTime / 3600, 10);
@@ -358,7 +359,7 @@ class Display {
                 return;
             }
             let newTitle = "Music Timer (" +
-                (Time.isTimerOvertimed() ? "-": "") +
+                (Time.IsTimerOvertimed() ? "-": "") +
                 (hours <= 0 ? "" : display_hours.innerHTML + ":") +
                 display_minutes.innerHTML + ":" +
                 display_seconds.innerHTML + ')';
@@ -367,50 +368,50 @@ class Display {
         }
     }
 
-    static unlockDisplayForKeyboard() {
+    static UnlockDisplayForKeyboard() {
         document.getElementById("display").classList.remove("locked");
         document.getElementById("lock_image").classList.add("hidden");
     }
-    static lockDisplayForKeyboard() {
+    static LockDisplayForKeyboard() {
         document.getElementById("display").classList.add("locked");
         document.getElementById("lock_image").classList.remove("hidden");
     }
-    static isDisplayLocked() {
+    static IsDisplayLocked() {
         return document.getElementById("display").classList.contains("locked");
     }
 
-    static setDefaultTitle() {
+    static SetDefaultTitle() {
         document.querySelector('title').textContent = 'Music Timer';
     }
 
-    static showInvalidVideoError() {
+    static ShowInvalidVideoError() {
         const invalidVideoAlert = document.getElementById("invalid_video")
         invalidVideoAlert.classList.remove("hidden")
         setTimeout(function () {
-            Display.hideInvalidVideoError();
+            Display.HideInvalidVideoError();
         }, 1000);
     }
-    static hideInvalidVideoError() {
+    static HideInvalidVideoError() {
         document.getElementById("invalid_video").classList.add("hidden")
     }
 
-    static clearLinkLabel() {
+    static ClearLinkLabel() {
         document.getElementById("link-label").value = "";
     }
 
-    static hidePlayer() {
+    static HidePlayer() {
         document.getElementById("player").classList.add("hidden")
     }
-    static showPlayer() {
+    static ShowPlayer() {
         document.getElementById("player").classList.remove("hidden")
     }
 
-    static toggleVideo(){
+    static ToggleVideo(){
         document.getElementById("player").classList.toggle("hidden");
-        Display.updateHideButton();
+        Display.UpdateHideButton();
     }
-    static updateHideButton(){
-        if(Video.hasVideoBeenSet()){
+    static UpdateHideButton(){
+        if(Video.HasVideoBeenSet()){
             document.getElementById("hide_show_button").disabled = false;
         }
         if(document.getElementById("player").classList.contains("hidden")){
@@ -419,11 +420,11 @@ class Display {
         }
         document.getElementById("hide_show_img").src="./assets/images/hide.png";
     }
-    static updateMuteButton(){
-        if(Video.hasVideoBeenSet()){
+    static UpdateMuteButton(){
+        if(Video.HasVideoBeenSet()){
             document.getElementById("mute_sound_button").disabled = false;
         }
-        if (!(Video.isMuted()||Video.isMuted()== undefined)) {
+        if (!(Video.IsMuted()||Video.IsMuted()== undefined)) {
             document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
             return;
         }
@@ -436,7 +437,7 @@ class Display {
     static HideOvertimeDisplay() {
         document.getElementById("display_div").classList.remove("overtimed");
     }
-    static hasDisplayOvertime(){
+    static HasDisplayOvertime(){
         return document.getElementById("display_div").classList.contains("overtimed")
     }
 
@@ -449,42 +450,42 @@ class Display {
 }
 
 class Video {
-    static loadPlayer() {
+    static LoadPlayer() {
         Player = new YT.Player('player', {
             height: '360',
             width: '640'
         });
     }
 
-    static playVideo() {
+    static PlayVideo() {
         Player.playVideo();
     }
-    static stopVideo() {
+    static StopVideo() {
         Player.stopVideo();
     }
-    static pauseVideo() {
+    static PauseVideo() {
         Player.pauseVideo();
     }
-    static isMuted() {
+    static IsMuted() {
         return Player.isMuted();
     }
     
-    static toggleMute() {
-        if (Video.isMuted()){
+    static ToggleMute() {
+        if (Video.IsMuted()){
             Player.unMute();
         }
         else {
             Player.mute();
         }
-        Display.updateMuteButton()
+        Display.UpdateMuteButton()
 
         
     }
-    static hasVideoBeenSet() {
+    static HasVideoBeenSet() {
         return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
     }
 
-    static setVideo() {
+    static SetVideo() {
 
         const link = document.getElementById("link-label").value;
         let linkType = "invalid";
@@ -492,21 +493,21 @@ class Video {
 
         const linkTypes = {
             "single": function () {
-                Display.showPlayer();
+                Display.ShowPlayer();
                 Player.loadVideoById(id);
-                Display.hideInvalidVideoError()
+                Display.HideInvalidVideoError()
             },
             "playlist": function () {
-                Display.showPlayer();
+                Display.ShowPlayer();
                 Player.loadPlaylist({
                     list: id,
                     listType: "playlist",
                     index: index
                 });
-                Display.hideInvalidVideoError();
+                Display.HideInvalidVideoError();
             },
             "invalid": function () {
-                Display.showInvalidVideoError();
+                Display.ShowInvalidVideoError();
             }
         }
 
@@ -548,36 +549,36 @@ class Video {
 
         let videoStateChecker = setInterval(() => {
             if (ApplicationState != 'playing' && Player.getPlayerState() === 1) {
-                Video.stopVideo();
+                Video.StopVideo();
                 clearInterval(videoStateChecker);
             }
         }, 10);
 
-        Display.clearLinkLabel();
-        Display.updateHideButton();
-        Display.updateMuteButton();
+        Display.ClearLinkLabel();
+        Display.UpdateHideButton();
+        Display.UpdateMuteButton();
 
     }
 
-    static clearVideo() {    
+    static ClearVideo() {    
         Player.stopVideo();    
         Player.loadVideoById("000");
-        Display.hidePlayer();
+        Display.HidePlayer();
     }
 }
 
 class Sounds {
-    static loadAlarm() {
+    static LoadAlarm() {
         Alarm = new Audio('./assets/audio/ringtone.mp3');
     }
 
-    static playAlarm(){
+    static PlayAlarm(){
         Alarm.play();
     }
 }
 
 class Help {
-    static toggleHelp() {
+    static ToggleHelp() {
         document.getElementById("help_text").classList.toggle("hidden");
     }
 }

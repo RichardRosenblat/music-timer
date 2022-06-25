@@ -13,7 +13,7 @@
     <link rel="icon" href="./assets/images/hourglass.ico">
 </head>
 
-<body onkeydown="Input.recieveInput(event)" onload="Application.load()">
+<body onkeydown="Input.RecieveInput(event)" onload="Application.Load()">
     <div class="main">
         <div class="text-center">
             <div id="display_div" class="d-flex justify-content-center m-4 over">
@@ -26,28 +26,28 @@
                 <img src="assets/images/lock.png" id="lock_image" class="hidden img" title="Display is locked for entering number from keyboard"
                     alt="Display is locked for entering number from keyboard"">
             </div>
-            <button type="button" id="start" class="btn btn-primary mx-1" onclick="States.cycleStates()">Start</button>
+            <button type="button" id="start" class="btn btn-primary mx-1" onclick="States.CycleStates()">Start</button>
             <button type="button" id="clear" class="btn btn-danger mx-1"
-                onclick="States.changeStatesTo('idle')">Clear</button>
+                onclick="States.ChangeStatesTo('idle')">Clear</button>
         </div>
         <div class="text-center buttons-div py-2">
             <div class="d-flex justify-content-center m-4">
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterMinutes(-10)">-10m</button>
+                    onclick="Time.AlterMinutes(-10)">-10m</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterMinutes(-5)">-5m</button>
+                    onclick="Time.AlterMinutes(-5)">-5m</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterMinutes(-1)">-1m</button>
+                    onclick="Time.AlterMinutes(-1)">-1m</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterSeconds(-30)">-30s</button>
+                    onclick="Time.AlterSeconds(-30)">-30s</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterSeconds(30)">+30s</button>
+                    onclick="Time.AlterSeconds(30)">+30s</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterMinutes(1)">+1m</button>
+                    onclick="Time.AlterMinutes(1)">+1m</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterMinutes(5)">+5m</button>
+                    onclick="Time.AlterMinutes(5)">+5m</button>
                 <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.alterMinutes(10)">+10m</button>
+                    onclick="Time.AlterMinutes(10)">+10m</button>
             </div>
         </div>
     </div>
@@ -56,12 +56,12 @@
             <input id="link-label" type="text" class="form-control" placeholder="Youtube Link"
                 aria-label="Youtube Link">
             <div class="input-group-append display-flex">
-                <button class="corners-tl-bl-pointy  btn btn-success" onclick="Video.setVideo()"
+                <button class="corners-tl-bl-pointy  btn btn-success" onclick="Video.SetVideo()"
                     type="button">Set</button>
             </div>
         </div>
-        <button class="btn btn-primary" onclick="Display.toggleVideo()" disabled id="hide_show_button" type="button"><img id="hide_show_img" class="reverse_img" src="./assets/images/hide.png"></img></button>
-        <button class="btn btn-primary" onclick="Video.toggleMute()" disabled id="mute_sound_button" type="button"><img id="mute_sound_img" class="reverse_img" src="./assets/images/mute.png"></img></button>
+        <button class="btn btn-primary" onclick="Display.ToggleVideo()" disabled id="hide_show_button" type="button"><img id="hide_show_img" class="reverse_img" src="./assets/images/hide.png"></img></button>
+        <button class="btn btn-primary" onclick="Video.ToggleMute()" disabled id="mute_sound_button" type="button"><img id="mute_sound_img" class="reverse_img" src="./assets/images/mute.png"></img></button>
         <div class="justify-content-center m-2">
             <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
             <div id="player" class="hidden"></div>
@@ -95,7 +95,7 @@
             <b>Space :</b> Start/Pause<br>
             <b>Esc :</b> Stop/Clear<br>
         </p>
-        <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="Help.toggleHelp()">?</button>
+        <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="Help.ToggleHelp()">?</button>
     </div>
 </body>
 
