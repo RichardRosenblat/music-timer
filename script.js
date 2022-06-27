@@ -120,6 +120,26 @@ class Buttons {
         document.getElementById("start").blur();
         document.getElementById("clear").blur();
     }
+    static UpdateHideButton(){
+        if(Video.HasVideoBeenSet()){
+            document.getElementById("hide_show_button").disabled = false;
+        }
+        if(document.getElementById("player").classList.contains("hidden")){
+            document.getElementById("hide_show_img").src = "./assets/images/show.png";
+            return;
+        }
+        document.getElementById("hide_show_img").src="./assets/images/hide.png";
+    }
+    static UpdateMuteButton(){
+        if(Video.HasVideoBeenSet()){
+            document.getElementById("mute_sound_button").disabled = false;
+        }
+        if (!(Video.IsMuted()||Video.IsMuted()== undefined)) {
+            document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
+            return;
+        }
+        document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
+    }
 }
 
 class Input {
@@ -408,27 +428,7 @@ class Display {
 
     static ToggleVideo(){
         document.getElementById("player").classList.toggle("hidden");
-        Display.UpdateHideButton();
-    }
-    static UpdateHideButton(){
-        if(Video.HasVideoBeenSet()){
-            document.getElementById("hide_show_button").disabled = false;
-        }
-        if(document.getElementById("player").classList.contains("hidden")){
-            document.getElementById("hide_show_img").src = "./assets/images/show.png";
-            return;
-        }
-        document.getElementById("hide_show_img").src="./assets/images/hide.png";
-    }
-    static UpdateMuteButton(){
-        if(Video.HasVideoBeenSet()){
-            document.getElementById("mute_sound_button").disabled = false;
-        }
-        if (!(Video.IsMuted()||Video.IsMuted()== undefined)) {
-            document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
-            return;
-        }
-        document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
+        Buttons.UpdateHideButton();
     }
 
     static ShowOvertimeDisplay() {
@@ -477,7 +477,7 @@ class Video {
         else {
             Player.mute();
         }
-        Display.UpdateMuteButton()
+        Buttons.UpdateMuteButton()
 
         
     }
@@ -555,8 +555,8 @@ class Video {
         }, 10);
 
         Display.ClearLinkLabel();
-        Display.UpdateHideButton();
-        Display.UpdateMuteButton();
+        Buttons.UpdateHideButton();
+        Buttons.UpdateMuteButton();
 
     }
 
