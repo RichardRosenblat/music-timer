@@ -3,6 +3,7 @@
 
 var ApplicationState = "idle";
 
+const SONG_SEPARATOR = "#%$"
 var RemainingTime = 0;
 var Player;
 
@@ -15,7 +16,8 @@ function onYouTubeIframeAPIReady() {
 }
 class Application {
     static Load() {
-        Sounds.LoadAlarm() 
+        SongStorage.CreateSaveStorageIfInexistent();
+        Sounds.LoadAlarm() ;
 
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -140,6 +142,10 @@ class Buttons {
         }
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
     }
+
+    static OpenSongLink(el){
+        window.open(el.innerHTML,'_blank')
+    }
 }
 
 class Input {
@@ -213,7 +219,7 @@ class Input {
 
         if (document.getElementById("link-label") === document.activeElement) {
             if (key == "Enter") {
-                Video.setVideoDepreciated();
+                Video.setVideo();
             }
             return;
         }
@@ -447,6 +453,45 @@ class Display {
     static HideNegativeSign() {
         document.getElementById("display-negative").classList.add("hidden");
     }
+    
+    static GetLinkLabelValue() {
+        return document.getElementById("link-label").value;
+    }
+
+
+    static UpdateSavedSongsTable(){
+        /*
+            get table
+            get read saves    
+
+            iterate through saved songs
+                create row
+                
+                create first table data
+                    set table data scope to "row"
+                    add i to table data as innerHtml
+                add first table data to row
+
+                create link button
+                    set InnerHtml as saved songs [i]
+                    set classes as "btn btn-link" 
+                    set type as "button" 
+                    add onclick event listener and set as "Buttons.OpenSongLink(this)"
+                create second table data
+                    add link button as child of second table data
+                add second table data to row
+                    
+                create delete button
+                    set innerHtml as "X"
+                    set classes as "btn btn-danger" 
+                    set type as "button" 
+                    add onclick event listener and set as "SongStorage.Delete(this)"
+                create third table data
+                    add delete button as child of third table data
+                add second table data to row
+                
+        */
+    }
 }
 
 class Video {
@@ -485,9 +530,8 @@ class Video {
         return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
     }
 
-    static SetVideo() {
+    static SetVideo(link = Display.GetLinkLabelValue()) {
 
-        const link = document.getElementById("link-label").value;
         let linkType = "invalid";
         let index = 0;
 
@@ -574,6 +618,56 @@ class Sounds {
 
     static PlayAlarm(){
         Alarm.play();
+    }
+}
+
+const CLEAR_SAVE_ON_START = true;
+
+class SongStorage {
+    static CreateSaveStorageIfInexistent(){        
+        if (CLEAR_SAVE_ON_START) {
+            localStorage.clear();
+        }
+
+        if (localStorage.savedSongs==null) {
+            localStorage.savedSongs = "";
+        }
+    }
+    
+    
+    static Save(parameter){
+        localStorage.savedSongs += "foo" + SONG_SEPARATOR
+        console.log(localStorage.savedSongs)
+
+        // if given an array set all array as the saved link
+        // if given a string add string to save storage
+        // if given nothing get string from Display.GetLinkLabelValue()
+        // saveBehaviours[typeof parameter]
+        // array.join(SONG_SEPARATOR)
+
+    }
+
+    static Load(){
+        console.log(SongStorage.Read());
+
+        // go one by one from array and queue them
+        // if link is a playlist it will call the add playlist function
+    }
+
+    static Read(){
+        let result = localStorage.savedSongs.split(SONG_SEPARATOR);
+        result.pop();
+
+        return result;
+    }
+
+    static Delete(el){
+        if (el === undefined) {
+            console.log("Deleting all saved songs");
+            localStorage.savedSongs = "";
+            return;
+        }
+        console.log(el.parentElement.parentElement.children[1].children[0].innerHTML);
     }
 }
 

@@ -23,80 +23,127 @@
                 <h1 id="display_minutes">00</h1>
                 <h1 id="display" class="mx-1">:</h1>
                 <h1 id="display_seconds">00</h1>
-                <img src="assets/images/lock.png" id="lock_image" class="hidden img" title="Display is locked for entering number from keyboard"
+                <img src="assets/images/lock.png" id="lock_image" class="hidden img"
+                    title="Display is locked for entering number from keyboard"
                     alt="Display is locked for entering number from keyboard"">
             </div>
-            <button type="button" id="start" class="btn btn-primary mx-1" onclick="States.CycleStates()">Start</button>
-            <button type="button" id="clear" class="btn btn-danger mx-1"
-                onclick="States.ChangeStatesTo('idle')">Clear</button>
-        </div>
-        <div class="text-center buttons-div py-2">
-            <div class="d-flex justify-content-center m-4">
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterMinutes(-10)">-10m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterMinutes(-5)">-5m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterMinutes(-1)">-1m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterSeconds(-30)">-30s</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterSeconds(30)">+30s</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterMinutes(1)">+1m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterMinutes(5)">+5m</button>
-                <button type="button" class="btn btn-secondary mx-2 btn-border"
-                    onclick="Time.AlterMinutes(10)">+10m</button>
+            <button type=" button" id="start" class="btn btn-primary mx-1"
+                    onclick="States.CycleStates()">Start</button>
+                <button type="button" id="clear" class="btn btn-danger mx-1"
+                    onclick="States.ChangeStatesTo('idle')">Clear</button>
+            </div>
+            <div class="text-center buttons-div py-2">
+                <div class="d-flex justify-content-center m-4">
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterMinutes(-10)">-10m</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterMinutes(-5)">-5m</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterMinutes(-1)">-1m</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterSeconds(-30)">-30s</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterSeconds(30)">+30s</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterMinutes(1)">+1m</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterMinutes(5)">+5m</button>
+                    <button type="button" class="btn btn-secondary mx-2 btn-border"
+                        onclick="Time.AlterMinutes(10)">+10m</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="text-center input-div">
-        <div class="input-group my-3 label">
-            <input id="link-label" type="text" class="form-control" placeholder="Youtube Link"
-                aria-label="Youtube Link">
-            <div class="input-group-append display-flex">
-                <button class="corners-tl-bl-pointy  btn btn-success" onclick="Video.SetVideo()"
-                    type="button">Set</button>
+        <div class="text-center input-div">
+            <div class="input-group my-3 label">
+                <input id="link-label" type="text" class="form-control" placeholder="Youtube Link"
+                    aria-label="Youtube Link">
+                <div class="input-group-append display-flex">
+                    <button class="corners-tl-bl-pointy  btn btn-success" onclick="Video.SetVideo()"
+                        type="button">Set</button>
+                </div>
+            </div>
+            <div class="mb-2">
+                <button class="btn btn-primary" onclick="Display.ToggleVideo()" disabled id="hide_show_button"
+                    type="button"><img id="hide_show_img" class="reverse_img"
+                        src="./assets/images/hide.png"></img></button>
+                <button class="btn btn-primary" onclick="Video.ToggleMute()" disabled id="mute_sound_button"
+                    type="button"><img id="mute_sound_img" class="reverse_img"
+                        src="./assets/images/mute.png"></img></button>
+            </div>
+
+            <div class="justify-content-center m-2">
+                <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
+                <div id="player" class="hidden"></div>
+                <h10 class="disclaimer"> <br> Please take notice that, depending on privacy configurations, not all
+                    videos
+                    are able to be embeded!</h10>
             </div>
         </div>
-        <button class="btn btn-primary" onclick="Display.ToggleVideo()" disabled id="hide_show_button" type="button"><img id="hide_show_img" class="reverse_img" src="./assets/images/hide.png"></img></button>
-        <button class="btn btn-primary" onclick="Video.ToggleMute()" disabled id="mute_sound_button" type="button"><img id="mute_sound_img" class="reverse_img" src="./assets/images/mute.png"></img></button>
-        <div class="justify-content-center m-2">
-            <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
-            <div id="player" class="hidden"></div>
-            <h10 class="disclaimer"> <br> Please take notice that, depending on privacy configurations, not all videos
-                are able to be embeded!</h10>
+        <div class="center">
+            <div>
+                <button class="btn btn-primary" onclick="SongStorage.Save()" id="save_button"
+                    type="button">Save</button>
+                <button class="btn btn-primary" onclick="SongStorage.Load()" id="load_button"
+                    type="button">Load</button>
+                <button class="btn btn-primary" onclick="SongStorage.Delete()" id="delete_button"
+                    type="button">Delete</button>
+            </div>
+            <div class="table-div">
+                <table class="table table-striped table-hover table-bordered table-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Saved song</th>
+                            <th scope="col">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="saves-table-body">
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>
+                                <button type="button" class="btn btn-link" onclick="Buttons.OpenSongLink(this)">
+                                    https://www.youtube.com/watch?v=MkQW5xr9iGc
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger" type="button" onclick="SongStorage.Delete(this)">
+                                    X
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success" type="button" onclick="Display.UpdateSavedSongsTable()">test</button>
+            </div>
         </div>
-    </div>
-    <div class="footer">
-        <p id="help_text" class="help_text text-sm hidden mx-4">
-            <b>Lock symbol :</b> Display is locked for entering number from keyboard<br>
-            <br>
-            <b>ArrowUp :</b> Add 30 seconds<br>
-            <b>ArrowDown :</b> Minus 30 seconds<br>
-            <b>ArrowRight :</b> Add 1 minute<br>
-            <b>ArrowLeft :</b> Minus 1 minute<br>
-            <b>PageUp :</b> Add 5 minutes<br>
-            <b>PageDown :</b> Minus 5 minutes<br>
-            <b>Home :</b> Add 10 minutes<br>
-            <b>End :</b> Minus 10 minutes<br>
-            <b>Enter :</b> Start/Pause<br>
-            <b>Delete :</b> Stop/Clear<br>
-            <br>
-            <b>w :</b> Add 30 seconds<br>
-            <b>s :</b> Minus 30 seconds<br>
-            <b>d :</b> Add 1 minute<br>
-            <b>a :</b> Minus 1 minute<br>
-            <b>e :</b> Add 5 minutes<br>
-            <b>q :</b> Minus 5 minutes<br>
-            <b>r :</b> Add 10 minutes<br>
-            <b>f :</b> Minus 10 minutes<br>
-            <b>Space :</b> Start/Pause<br>
-            <b>Esc :</b> Stop/Clear<br>
-        </p>
-        <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="Help.ToggleHelp()">?</button>
-    </div>
+        <div class="footer">
+            <p id="help_text" class="help_text text-sm hidden mx-4">
+                <b>Lock symbol :</b> Display is locked for entering number from keyboard<br>
+                <br>
+                <b>ArrowUp :</b> Add 30 seconds<br>
+                <b>ArrowDown :</b> Minus 30 seconds<br>
+                <b>ArrowRight :</b> Add 1 minute<br>
+                <b>ArrowLeft :</b> Minus 1 minute<br>
+                <b>PageUp :</b> Add 5 minutes<br>
+                <b>PageDown :</b> Minus 5 minutes<br>
+                <b>Home :</b> Add 10 minutes<br>
+                <b>End :</b> Minus 10 minutes<br>
+                <b>Enter :</b> Start/Pause<br>
+                <b>Delete :</b> Stop/Clear<br>
+                <br>
+                <b>w :</b> Add 30 seconds<br>
+                <b>s :</b> Minus 30 seconds<br>
+                <b>d :</b> Add 1 minute<br>
+                <b>a :</b> Minus 1 minute<br>
+                <b>e :</b> Add 5 minutes<br>
+                <b>q :</b> Minus 5 minutes<br>
+                <b>r :</b> Add 10 minutes<br>
+                <b>f :</b> Minus 10 minutes<br>
+                <b>Space :</b> Start/Pause<br>
+                <b>Esc :</b> Stop/Clear<br>
+            </p>
+            <button type="button" class="btn btn-secondary mx-2 mb-4" onclick="Help.ToggleHelp()">?</button>
+        </div>
 </body>
 
 </html>
