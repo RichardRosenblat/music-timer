@@ -1,14 +1,12 @@
 //working video url: https://www.youtube.com/watch?v=MkQW5xr9iGc
 //not working video url: https://youtu.be/ETEg-SB01QY
 
-var ApplicationState = "idle";
-
 const SONG_SEPARATOR = "#%$"
+var LastSong;
+var ApplicationState = "idle";
 var RemainingTime = 0;
 var Player;
-
 var TimerId;
-
 var Alarm;
 
 function onYouTubeIframeAPIReady() {
@@ -17,7 +15,7 @@ function onYouTubeIframeAPIReady() {
 class Application {
     static Load() {
         SongStorage.CreateSaveStorageIfInexistent();
-        Sounds.LoadAlarm() ;
+        Sounds.LoadAlarm();
 
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -88,7 +86,7 @@ class States {
                 Display.LockDisplayForKeyboard();
             },
             "paused": function () {
-                if (Time.IsTimerOvertimed()){
+                if (Time.IsTimerOvertimed()) {
                     States.ChangeStatesTo("overtimed");
                     return;
                 }
@@ -122,29 +120,29 @@ class Buttons {
         document.getElementById("start").blur();
         document.getElementById("clear").blur();
     }
-    static UpdateHideButton(){
-        if(Video.HasVideoBeenSet()){
+    static UpdateHideButton() {
+        if (Video.HasVideoBeenSet()) {
             document.getElementById("hide_show_button").disabled = false;
         }
-        if(document.getElementById("player").classList.contains("hidden")){
+        if (document.getElementById("player").classList.contains("hidden")) {
             document.getElementById("hide_show_img").src = "./assets/images/show.png";
             return;
         }
-        document.getElementById("hide_show_img").src="./assets/images/hide.png";
+        document.getElementById("hide_show_img").src = "./assets/images/hide.png";
     }
-    static UpdateMuteButton(){
-        if(Video.HasVideoBeenSet()){
+    static UpdateMuteButton() {
+        if (Video.HasVideoBeenSet()) {
             document.getElementById("mute_sound_button").disabled = false;
         }
-        if (!(Video.IsMuted()||Video.IsMuted()== undefined)) {
+        if (!(Video.IsMuted() || Video.IsMuted() == undefined)) {
             document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
             return;
         }
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
     }
 
-    static OpenSongLink(el){
-        window.open(el.innerHTML,'_blank')
+    static OpenSongLink(el) {
+        window.open(el.innerHTML, '_blank')
     }
 }
 
@@ -304,7 +302,7 @@ class Time {
             }
         } else {
             if (RemainingTime - value <= 0) {
-                RemainingTime = (RemainingTime-value)*-1;
+                RemainingTime = (RemainingTime - value) * -1;
                 States.ChangeStatesTo("playing");
             } else {
                 RemainingTime -= value;
@@ -315,11 +313,10 @@ class Time {
 
     static StartTimer() {
         TimerId = setInterval(() => {
-            if (ApplicationState != "overtimed" && --RemainingTime <= 0) {            
+            if (ApplicationState != "overtimed" && --RemainingTime <= 0) {
                 Time.ClearTimer();
                 States.ChangeStatesTo("overtimed");
-            }
-            else if (ApplicationState == "overtimed") {
+            } else if (ApplicationState == "overtimed") {
                 RemainingTime++;
             }
             Display.UpdateDisplays();
@@ -332,7 +329,7 @@ class Time {
         RemainingTime = 0;
     }
 
-    static IsTimerOvertimed(){
+    static IsTimerOvertimed() {
         return Display.HasDisplayOvertime();
     }
 }
@@ -385,7 +382,7 @@ class Display {
                 return;
             }
             let newTitle = "Music Timer (" +
-                (Time.IsTimerOvertimed() ? "-": "") +
+                (Time.IsTimerOvertimed() ? "-" : "") +
                 (hours <= 0 ? "" : display_hours.innerHTML + ":") +
                 display_minutes.innerHTML + ":" +
                 display_seconds.innerHTML + ')';
@@ -432,7 +429,7 @@ class Display {
         document.getElementById("player").classList.remove("hidden")
     }
 
-    static ToggleVideo(){
+    static ToggleVideo() {
         document.getElementById("player").classList.toggle("hidden");
         Buttons.UpdateHideButton();
     }
@@ -443,7 +440,7 @@ class Display {
     static HideOvertimeDisplay() {
         document.getElementById("display_div").classList.remove("overtimed");
     }
-    static HasDisplayOvertime(){
+    static HasDisplayOvertime() {
         return document.getElementById("display_div").classList.contains("overtimed")
     }
 
@@ -453,44 +450,89 @@ class Display {
     static HideNegativeSign() {
         document.getElementById("display-negative").classList.add("hidden");
     }
-    
+
     static GetLinkLabelValue() {
         return document.getElementById("link-label").value;
     }
 
+    static UpdateSavedSongsTable() {
+        let tableBody = document.getElementById("saves-table-body")
+        let savedSongs = SongStorage.Read();
 
-    static UpdateSavedSongsTable(){
-        /*
-            get table
-            get read saves    
+        deletePreviousTable();
 
-            iterate through saved songs
-                create row
-                
-                create first table data
-                    set table data scope to "row"
-                    add i to table data as innerHtml
-                add first table data to row
+        createNewTable();
 
-                create link button
-                    set InnerHtml as saved songs [i]
-                    set classes as "btn btn-link" 
-                    set type as "button" 
-                    add onclick event listener and set as "Buttons.OpenSongLink(this)"
-                create second table data
-                    add link button as child of second table data
-                add second table data to row
-                    
-                create delete button
-                    set innerHtml as "X"
-                    set classes as "btn btn-danger" 
-                    set type as "button" 
-                    add onclick event listener and set as "SongStorage.Delete(this)"
-                create third table data
-                    add delete button as child of third table data
-                add second table data to row
-                
-        */
+        function deletePreviousTable() {
+            document.getElementById("saves-table-body").replaceChildren();
+        }
+
+        function createNewTable() {
+            for (let i = 0; i < savedSongs.length; i++) {
+                let savedSong = savedSongs[i];
+                let row = document.createElement("tr");
+                row.appendChild(createNumberCell(i));
+                row.appendChild(createLinkCell(savedSong));
+                row.appendChild(createRemoveCell());
+                tableBody.appendChild(row);
+            }
+
+            function createNumberCell(i) {
+                let cell = document.createElement("th");
+                let number = document.createTextNode(i + 1);
+                cell.setAttribute("scope", "row");
+                cell.appendChild(number);
+                return cell;
+            }
+
+            function createLinkCell(savedSong) {
+
+                let cell = document.createElement("td");
+
+                cell.appendChild(createLinkButton());
+
+                return cell;
+
+                function createLinkButton() {
+                    let linkButton = document.createElement("button");
+
+                    let linkText = document.createTextNode(savedSong);
+
+                    linkButton.appendChild(linkText);
+                    linkButton.classList.add("btn");
+                    linkButton.classList.add("btn-link");
+                    linkButton.setAttribute("type", "button");
+                    linkButton.addEventListener("click", () => { Buttons.OpenSongLink(linkButton); });
+
+                    return linkButton;
+                }
+
+            }
+
+            function createRemoveCell() {
+
+                let cell = document.createElement("td");
+
+                cell.appendChild(createRemoveButton());
+
+                return cell;
+
+                function createRemoveButton() {
+                    let removeButton = document.createElement("button");
+
+                    let removeText = document.createTextNode("x");
+
+                    removeButton.appendChild(removeText);
+                    removeButton.classList.add("btn");
+                    removeButton.classList.add("btn-danger");
+                    removeButton.setAttribute("type", "button");
+                    removeButton.addEventListener("click", () => { SongStorage.Delete(removeButton); });
+
+                    return removeButton;
+                }
+
+            }
+        }
     }
 }
 
@@ -514,23 +556,24 @@ class Video {
     static IsMuted() {
         return Player.isMuted();
     }
-    
+
     static ToggleMute() {
-        if (Video.IsMuted()){
+        if (Video.IsMuted()) {
             Player.unMute();
-        }
-        else {
+        } else {
             Player.mute();
         }
         Buttons.UpdateMuteButton()
 
-        
+
     }
     static HasVideoBeenSet() {
         return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
     }
 
     static SetVideo(link = Display.GetLinkLabelValue()) {
+
+        LastSong = link;
 
         let linkType = "invalid";
         let index = 0;
@@ -604,8 +647,8 @@ class Video {
 
     }
 
-    static ClearVideo() {    
-        Player.stopVideo();    
+    static ClearVideo() {
+        Player.stopVideo();
         Player.loadVideoById("000");
         Display.HidePlayer();
     }
@@ -616,58 +659,70 @@ class Sounds {
         Alarm = new Audio('./assets/audio/ringtone.mp3');
     }
 
-    static PlayAlarm(){
+    static PlayAlarm() {
         Alarm.play();
     }
 }
 
-const CLEAR_SAVE_ON_START = true;
+const CLEAR_SAVE_ON_START = false;
 
 class SongStorage {
-    static CreateSaveStorageIfInexistent(){        
+    static CreateSaveStorageIfInexistent() {
         if (CLEAR_SAVE_ON_START) {
             localStorage.clear();
         }
 
-        if (localStorage.savedSongs==null) {
+        if (localStorage.savedSongs == null) {
             localStorage.savedSongs = "";
         }
     }
-    
-    
-    static Save(parameter){
-        localStorage.savedSongs += "foo" + SONG_SEPARATOR
-        console.log(localStorage.savedSongs)
 
-        // if given an array set all array as the saved link
-        // if given a string add string to save storage
-        // if given nothing get string from Display.GetLinkLabelValue()
-        // saveBehaviours[typeof parameter]
-        // array.join(SONG_SEPARATOR)
-
-    }
-
-    static Load(){
-        console.log(SongStorage.Read());
-
-        // go one by one from array and queue them
-        // if link is a playlist it will call the add playlist function
-    }
-
-    static Read(){
+    static Read() {
         let result = localStorage.savedSongs.split(SONG_SEPARATOR);
         result.pop();
 
         return result;
     }
 
-    static Delete(el){
+    static Load() {
+        console.log(SongStorage.Read());
+
+        // go one by one from array and queue them
+        // if link is a playlist it will call the add playlist function
+    }
+
+    static Save(song=LastSong) {
+        localStorage.savedSongs += parameter + SONG_SEPARATOR
+        console.log(localStorage.savedSongs)
+
+        // if given an array set all array as the saved songs
+        // if given a string check if it is already present and will add string to save storage 
+        // if given nothing get string from LastSong
+        // saveBehaviours[typeof parameter]
+        // array.join(SONG_SEPARATOR)
+
+        Display.UpdateSavedSongsTable();
+    }
+
+    static Delete(el) {
         if (el === undefined) {
+            if (!confirm("Delete all saved songs?")) {
+                return;
+            }
+
             console.log("Deleting all saved songs");
             localStorage.savedSongs = "";
-            return;
+            
+        } else {
+            let savedSongs = SongStorage.Read();            
+            let indexOfItemToRemove = el.parentElement.parentElement.children[0].innerHTML-1;
+
+            savedSongs.splice(indexOfItemToRemove,1)
+
+            SongStorage.Save(savedSongs);
         }
-        console.log(el.parentElement.parentElement.children[1].children[0].innerHTML);
+
+        Display.UpdateSavedSongsTable();
     }
 }
 
