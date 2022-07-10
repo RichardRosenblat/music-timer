@@ -1,13 +1,16 @@
 //working video url: https://www.youtube.com/watch?v=MkQW5xr9iGc
 //not working video url: https://youtu.be/ETEg-SB01QY
 
-const SONG_SEPARATOR = "#%$"
-var LastSong;
+const SAVE_SEPARATOR = "###"
+var LastSong = "https://www.youtube.com/watch?v=MkQW5xr9iGc";
 var ApplicationState = "idle";
 var RemainingTime = 0;
 var Player;
 var TimerId;
 var Alarm;
+
+const CLEAR_SAVE_ON_START = false;
+const HIDE_SKETCH_TABLE_ROW = true;
 
 function onYouTubeIframeAPIReady() {
     Video.LoadPlayer();
@@ -15,12 +18,13 @@ function onYouTubeIframeAPIReady() {
 class Application {
     static Load() {
         SongStorage.CreateSaveStorageIfInexistent();
-        Sounds.LoadAlarm();
 
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        Sounds.LoadAlarm();
+        Video.LoadIframeAPI();
+
+        if (HIDE_SKETCH_TABLE_ROW) {
+            Display.UpdateSavedSongsTable();
+        }
     }
 }
 
@@ -456,7 +460,7 @@ class Display {
     }
 
     static UpdateSavedSongsTable() {
-        let tableBody = document.getElementById("saves-table-body")
+        let tableBody = document.getElementById("saves-table-body");
         let savedSongs = SongStorage.Read();
 
         deletePreviousTable();
@@ -472,8 +476,14 @@ class Display {
                 let savedSong = savedSongs[i];
                 let row = document.createElement("tr");
                 row.appendChild(createNumberCell(i));
+                row.appendChild(createImageCell(savedSong));
                 row.appendChild(createLinkCell(savedSong));
                 row.appendChild(createRemoveCell());
+
+                row.addEventListener("dblclick", () => {
+                    Video.SetVideo(savedSong);
+                });
+
                 tableBody.appendChild(row);
             }
 
@@ -483,6 +493,31 @@ class Display {
                 cell.setAttribute("scope", "row");
                 cell.appendChild(number);
                 return cell;
+            }
+
+            function createImageCell(savedSong) {
+                let cell = document.createElement("td");
+                let img = createImg(savedSong);
+
+                cell.appendChild(img);
+
+                return cell;
+
+                function createImg(savedSong) {
+                    let image = document.createElement("img");
+
+                    let id = Video.getVideoId(savedSong, Video.getVideoType(savedSong));
+
+                    image.setAttribute("src", "https://img.youtube.com/vi/" + id + "/mqdefault.jpg");
+
+                    image.setAttribute("width", "75");
+                    image.setAttribute("height", "42");
+
+                    image.setAttribute("alt", "Video's thumbnail");
+                    image.setAttribute("title", savedSong);
+
+                    return image;
+                }
             }
 
             function createLinkCell(savedSong) {
@@ -502,7 +537,9 @@ class Display {
                     linkButton.classList.add("btn");
                     linkButton.classList.add("btn-link");
                     linkButton.setAttribute("type", "button");
-                    linkButton.addEventListener("click", () => { Buttons.OpenSongLink(linkButton); });
+                    linkButton.addEventListener("click", () => {
+                        Buttons.OpenSongLink(linkButton);
+                    });
 
                     return linkButton;
                 }
@@ -526,7 +563,9 @@ class Display {
                     removeButton.classList.add("btn");
                     removeButton.classList.add("btn-danger");
                     removeButton.setAttribute("type", "button");
-                    removeButton.addEventListener("click", () => { SongStorage.Delete(removeButton); });
+                    removeButton.addEventListener("click", () => {
+                        SongStorage.Delete(removeButton);
+                    });
 
                     return removeButton;
                 }
@@ -537,6 +576,13 @@ class Display {
 }
 
 class Video {
+    static LoadIframeAPI() {
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
     static LoadPlayer() {
         Player = new YT.Player('player', {
             height: '360',
@@ -575,16 +621,17 @@ class Video {
 
         LastSong = link;
 
-        let linkType = "invalid";
-        let index = 0;
+        const linkType = Video.getVideoType(link);
+        const id = Video.getVideoId(link, linkType);
+        const index = Video.getVideoIndex(link, linkType);
 
         const linkTypes = {
-            "single": function () {
+            "single": () => {
                 Display.ShowPlayer();
                 Player.loadVideoById(id);
                 Display.HideInvalidVideoError()
             },
-            "playlist": function () {
+            "playlist": () => {
                 Display.ShowPlayer();
                 Player.loadPlaylist({
                     list: id,
@@ -593,43 +640,10 @@ class Video {
                 });
                 Display.HideInvalidVideoError();
             },
-            "invalid": function () {
+            "invalid": () => {
                 Display.ShowInvalidVideoError();
             }
         }
-
-        const id = getVideoId(link);
-
-
-        function getVideoId(link) {
-
-            if (link.includes("https://www.youtube.com") || link.includes("https://youtu.be/")) {
-
-
-                if (link.includes("index")) {
-                    linkType = "playlist"
-                    index = parseInt(link.split("index=").pop()) - 1;
-                    return link.split("list=").pop().split("&").shift();
-                }
-
-
-                if (link.includes("playlist?")) {
-                    linkType = "playlist";
-                    return link.split("list=").pop();
-                }
-
-
-                if (link.includes("watch?")) {
-                    linkType = "single";
-                    return link.substring(link.indexOf("=") + 1);
-                }
-
-                linkType = "single";
-                return link.substring(link.indexOf("/", 8) + 1);
-            }
-
-        }
-
 
         linkTypes[linkType]();
 
@@ -645,6 +659,53 @@ class Video {
         Buttons.UpdateHideButton();
         Buttons.UpdateMuteButton();
 
+    }
+
+    static getVideoType(link) {
+        if (link.match("https:\/\/(www\.)*youtu.*")) {
+            if (link.includes("index") || link.includes("playlist?")) {
+                return "playlist";
+            }
+            if (link.includes("watch?") || link.includes(".be/")) {
+                return "single";
+            }
+        }
+        return "invalid";
+    }
+
+    static getVideoId(link, type) {
+        const typeBehaviour = {
+            "single": () => {
+                if (link.includes("watch?")) {
+                    return link.substring(link.indexOf("=") + 1);
+                }
+
+                return link.substring(link.indexOf("/", 8) + 1);
+            },
+            "playlist": () => {
+                if (link.includes("index")) {
+                    return link.split("list=").pop().split("&").shift();
+                }
+                return link.split("list=").pop();
+            },
+            "invalid": () => {
+                return;
+            }
+        }
+
+        try {
+            return typeBehaviour[type]();
+        } catch (error) {
+            return;
+        }
+    }
+
+    static getVideoIndex(link, type) {
+        if (type === 'playlist' && link.includes("index")) {
+            return parseInt(link.split("index=").pop()) - 1;
+        }
+
+        return 0;
     }
 
     static ClearVideo() {
@@ -664,8 +725,6 @@ class Sounds {
     }
 }
 
-const CLEAR_SAVE_ON_START = false;
-
 class SongStorage {
     static CreateSaveStorageIfInexistent() {
         if (CLEAR_SAVE_ON_START) {
@@ -678,7 +737,7 @@ class SongStorage {
     }
 
     static Read() {
-        let result = localStorage.savedSongs.split(SONG_SEPARATOR);
+        let result = localStorage.savedSongs.split(SAVE_SEPARATOR);
         result.pop();
 
         return result;
@@ -691,15 +750,23 @@ class SongStorage {
         // if link is a playlist it will call the add playlist function
     }
 
-    static Save(song=LastSong) {
-        localStorage.savedSongs += parameter + SONG_SEPARATOR
-        console.log(localStorage.savedSongs)
+    static Save(song = LastSong) {
 
-        // if given an array set all array as the saved songs
-        // if given a string check if it is already present and will add string to save storage 
-        // if given nothing get string from LastSong
-        // saveBehaviours[typeof parameter]
-        // array.join(SONG_SEPARATOR)
+        const saveBehaviours = {
+            'object': () => {
+                song.push("");
+                localStorage.savedSongs = song.join(SAVE_SEPARATOR);
+            },
+            'string': () => {
+                localStorage.savedSongs += song + SAVE_SEPARATOR;
+            }
+        };
+
+        try {
+            saveBehaviours[typeof song]();
+        } catch (error) {
+            return;
+        }
 
         Display.UpdateSavedSongsTable();
     }
@@ -712,17 +779,18 @@ class SongStorage {
 
             console.log("Deleting all saved songs");
             localStorage.savedSongs = "";
-            
-        } else {
-            let savedSongs = SongStorage.Read();            
-            let indexOfItemToRemove = el.parentElement.parentElement.children[0].innerHTML-1;
+            Display.UpdateSavedSongsTable();
 
-            savedSongs.splice(indexOfItemToRemove,1)
+        } else {
+            let savedSongs = SongStorage.Read();
+
+            let indexOfItemToRemove = (el.parentElement.parentElement.children[0].innerHTML) - 1;
+
+            savedSongs.splice(indexOfItemToRemove, 1)
 
             SongStorage.Save(savedSongs);
         }
 
-        Display.UpdateSavedSongsTable();
     }
 }
 
