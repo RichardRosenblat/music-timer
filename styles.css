@@ -99,8 +99,8 @@ body {
 }
 
 .table-div{
-    margin-top: 15px;
+    width: 50%;
+    margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
-    width: 50%;
 }

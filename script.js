@@ -465,7 +465,17 @@ class Display {
 
         deletePreviousTable();
 
+        hideTableIfSaveEmpty();
+
         createNewTable();
+
+        function hideTableIfSaveEmpty() {
+            if (SongStorage.IsSaveEmpty()) {
+                Display.HideSavesTable();
+            } else {
+                Display.ShowSavesTable();
+            }
+        }
 
         function deletePreviousTable() {
             document.getElementById("saves-table-body").replaceChildren();
@@ -506,9 +516,14 @@ class Display {
                 function createImg(savedSong) {
                     let image = document.createElement("img");
 
-                    let id = Video.getVideoId(savedSong, Video.getVideoType(savedSong));
+                    let videoType = Video.getVideoType(savedSong);
 
-                    image.setAttribute("src", "https://img.youtube.com/vi/" + id + "/mqdefault.jpg");
+                    if (videoType == "playlist") {
+                        image.setAttribute("src", "assets\\images\\playlist.png");
+                    } else {
+                        let id = Video.getVideoId(savedSong, videoType);
+                        image.setAttribute("src", "https://img.youtube.com/vi/" + id + "/mqdefault.jpg");
+                    }
 
                     image.setAttribute("width", "75");
                     image.setAttribute("height", "42");
@@ -572,6 +587,13 @@ class Display {
 
             }
         }
+    }
+
+    static HideSavesTable() {
+        document.getElementById("saves-table-div").classList.add("hidden");
+    }
+    static ShowSavesTable() {
+        document.getElementById("saves-table-div").classList.remove("hidden");
     }
 }
 
@@ -750,8 +772,8 @@ class SongStorage {
         // if link is a playlist it will call the add playlist function
     }
 
-    static Save(song = LastSong) {
-
+    static Save(song = Display.GetLinkLabelValue() == "" ? LastSong : Display.GetLinkLabelValue()) {
+        console.log(song);
         const saveBehaviours = {
             'object': () => {
                 song.push("");
@@ -791,6 +813,10 @@ class SongStorage {
             SongStorage.Save(savedSongs);
         }
 
+    }
+
+    static IsSaveEmpty() {
+        return SongStorage.Read().length == 0
     }
 }
 

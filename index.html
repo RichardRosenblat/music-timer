@@ -74,12 +74,9 @@
             <div class="justify-content-center m-2">
                 <h1 id="invalid_video" class="hidden invalid_video alert alert-danger mb-5"> Invalid youtube video!</h1>
                 <div id="player" class="hidden"></div>
-                <h10 class="disclaimer"> <br> Please take notice that, depending on privacy configurations, not all
-                    videos
-                    are able to be embeded!
-                </h10>
             </div>
         </div>
+        
         <div class="center">
             <div>
                 <button class="btn btn-primary" onclick="SongStorage.Save()" id="save_button"
@@ -89,7 +86,11 @@
                 <button class="btn btn-primary" onclick="SongStorage.Delete()" id="delete_button"
                     type="button">Delete</button>
             </div>
-            <div  class="table-div">
+            <h10 class="disclaimer"> <br> Please take notice that, depending on privacy configurations, not all
+                videos
+                are able to be embeded!
+            </h10>
+            <div  id="saves-table-div" class="table-div">
                 <table class="table table-striped table-hover table-bordered table-dark">
                     <thead>
                         <tr>
@@ -119,7 +120,6 @@
                         </tr> -->
                     </tbody>
                 </table>
-                <button class="btn btn-success" type="button" onclick="Display.UpdateSavedSongsTable()">test</button>
             </div>
         </div>
         <div class="footer">
