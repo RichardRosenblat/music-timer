@@ -9,8 +9,6 @@ var Player;
 var TimerId;
 var Alarm;
 
-const CLEAR_SAVE_ON_START = false;
-const HIDE_SKETCH_TABLE_ROW = true;
 
 function onYouTubeIframeAPIReady() {
     Video.LoadPlayer();
@@ -18,13 +16,9 @@ function onYouTubeIframeAPIReady() {
 class Application {
     static Load() {
         SongStorage.CreateSaveStorageIfInexistent();
-
         Sounds.LoadAlarm();
         Video.LoadIframeAPI();
-
-        if (HIDE_SKETCH_TABLE_ROW) {
-            Display.UpdateSavedSongsTable();
-        }
+        Display.UpdateSavedSongsTable();
     }
 }
 
@@ -411,15 +405,33 @@ class Display {
         document.querySelector('title').textContent = 'Music Timer';
     }
 
-    static ShowInvalidVideoError() {
-        const invalidVideoAlert = document.getElementById("invalid_video")
-        invalidVideoAlert.classList.remove("hidden")
+    static ShowVideoError(errorCode) {
+        const videoErrorAlert = document.getElementById("video_error")
+
+        switch (errorCode) {
+            case 150:
+            case 101:
+                videoErrorAlert.innerHTML = "The owner of the video does not allow it to be embedded!"
+                break;
+            case 100:
+                videoErrorAlert.innerHTML = "Video not found!"
+                break;
+            case 5:
+                videoErrorAlert.innerHTML = "This video cannot be played on website players!"
+                break;
+            case 2:
+            default:
+                videoErrorAlert.innerHTML = "Invalid youtube video!"
+                break;
+        }
+
+        videoErrorAlert.classList.remove("hidden")
         setTimeout(function () {
-            Display.HideInvalidVideoError();
-        }, 1000);
+            Display.HideVideoError();
+        }, 3000);
     }
-    static HideInvalidVideoError() {
-        document.getElementById("invalid_video").classList.add("hidden")
+    static HideVideoError() {
+        document.getElementById("video_error").classList.add("hidden")
     }
 
     static ClearLinkLabel() {
@@ -608,7 +620,14 @@ class Video {
     static LoadPlayer() {
         Player = new YT.Player('player', {
             height: '360',
-            width: '640'
+            width: '640',
+            events: {
+                'onError': (event) => {
+                    console.log(event.data);
+                    Display.ShowVideoError(event.data);
+                },
+                // 'onStateChange': Video.StateChange()
+            }
         });
     }
 
@@ -647,11 +666,11 @@ class Video {
         const id = Video.getVideoId(link, linkType);
         const index = Video.getVideoIndex(link, linkType);
 
-        const linkTypes = {
+        const linkTypeBehaviours = {
             "single": () => {
                 Display.ShowPlayer();
                 Player.loadVideoById(id);
-                Display.HideInvalidVideoError()
+                Display.HideVideoError()
             },
             "playlist": () => {
                 Display.ShowPlayer();
@@ -660,14 +679,14 @@ class Video {
                     listType: "playlist",
                     index: index
                 });
-                Display.HideInvalidVideoError();
+                Display.HideVideoError();
             },
             "invalid": () => {
-                Display.ShowInvalidVideoError();
+                Display.ShowVideoError(2);
             }
         }
 
-        linkTypes[linkType]();
+        linkTypeBehaviours[linkType]();
 
 
         let videoStateChecker = setInterval(() => {
@@ -749,10 +768,6 @@ class Sounds {
 
 class SongStorage {
     static CreateSaveStorageIfInexistent() {
-        if (CLEAR_SAVE_ON_START) {
-            localStorage.clear();
-        }
-
         if (localStorage.savedSongs == null) {
             localStorage.savedSongs = "";
         }
@@ -773,7 +788,6 @@ class SongStorage {
     }
 
     static Save(song = Display.GetLinkLabelValue() == "" ? LastSong : Display.GetLinkLabelValue()) {
-        console.log(song);
         const saveBehaviours = {
             'object': () => {
                 song.push("");

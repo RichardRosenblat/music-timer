@@ -62,7 +62,7 @@ body {
     filter: invert(1);
 }
 
-.invalid_video {
+.video_error {
     zoom: 50%;
     border-radius: 25px;
     border: 5px solid #903139;
