@@ -58,7 +58,7 @@
                 <input id="link-label" type="text" class="form-control" placeholder="Youtube Link"
                     aria-label="Youtube Link">
                 <div class="input-group-append display-flex">
-                    <button class="corners-tl-bl-pointy  btn btn-success" onclick="Video.SetVideo()"
+                    <button id="set-video-button" class="corners-tl-bl-pointy btn btn-success" onclick="Video.SetVideoWithoutQueue()"
                         type="button">Set</button>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                 <button class="btn btn-primary" onclick="SongStorage.Delete()" id="delete_button"
                     type="button">Delete</button>
             </div>
-            <h10 class="disclaimer"> <br> Please take notice that, depending on privacy configurations, not all
+            <h10 class="disclaimer center"> <br> Please take notice that, depending on privacy configurations, not all
                 videos
                 are able to be embeded!
             </h10>

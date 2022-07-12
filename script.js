@@ -4,14 +4,25 @@
 const SAVE_SEPARATOR = "###"
 var LastSong = "https://www.youtube.com/watch?v=MkQW5xr9iGc";
 var ApplicationState = "idle";
-var RemainingTime = 0;
+var Queue = {
+    isEnabled: false,
+    index: 0,
+    disable: function () {
+        this.isEnabled = false;
+        this.index = 0;
+    },
+    enable: function (index = 0) {
+        this.isEnabled = true;
+        this.index = index;
+    }
+}
 var Player;
 var TimerId;
 var Alarm;
 
 
 function onYouTubeIframeAPIReady() {
-    Video.LoadPlayer();
+    Video.CreatePlayer();
 }
 class Application {
     static Load() {
@@ -215,7 +226,7 @@ class Input {
 
         if (document.getElementById("link-label") === document.activeElement) {
             if (key == "Enter") {
-                Video.setVideo();
+                document.getElementById("set-video-button").click();
             }
             return;
         }
@@ -503,6 +514,7 @@ class Display {
                 row.appendChild(createRemoveCell());
 
                 row.addEventListener("dblclick", () => {
+                    Queue.enable(i);
                     Video.SetVideo(savedSong);
                 });
 
@@ -617,18 +629,26 @@ class Video {
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
-    static LoadPlayer() {
+    static CreatePlayer() {
         Player = new YT.Player('player', {
             height: '360',
             width: '640',
             events: {
                 'onError': (event) => {
                     console.log(event.data);
-                    Display.ShowVideoError(event.data);
+                    Video.VideoErrorHandler(event.data);
                 },
-                // 'onStateChange': Video.StateChange()
+                'onStateChange': (event) => {
+                    Video.OnPlayerStateChange(event.data)
+                }
             }
         });
+    }
+
+    static OnPlayerStateChange(playerState) {
+        if (playerState == YT.PlayerState.ENDED) {
+            SongStorage.PlayNext();
+        }
     }
 
     static PlayVideo() {
@@ -658,6 +678,11 @@ class Video {
         return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
     }
 
+    static SetVideoWithoutQueue() {
+        Queue.disable();
+        Video.SetVideo()
+    }
+
     static SetVideo(link = Display.GetLinkLabelValue()) {
 
         LastSong = link;
@@ -682,19 +707,20 @@ class Video {
                 Display.HideVideoError();
             },
             "invalid": () => {
-                Display.ShowVideoError(2);
+                Video.VideoErrorHandler(2);
             }
         }
 
         linkTypeBehaviours[linkType]();
 
-
-        let videoStateChecker = setInterval(() => {
-            if (ApplicationState != 'playing' && Player.getPlayerState() === 1) {
-                Video.StopVideo();
-                clearInterval(videoStateChecker);
-            }
-        }, 10);
+        if (!Queue.isEnabled) {
+            let videoStateChecker = setInterval(() => {
+                if (ApplicationState != 'playing' && Player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    Video.StopVideo();
+                    clearInterval(videoStateChecker);
+                }
+            }, 10);    
+        }
 
         Display.ClearLinkLabel();
         Buttons.UpdateHideButton();
@@ -749,6 +775,11 @@ class Video {
         return 0;
     }
 
+    static VideoErrorHandler(errorCode) {
+        Display.ShowVideoError(errorCode);
+        SongStorage.PlayNext();
+    }
+
     static ClearVideo() {
         Player.stopVideo();
         Player.loadVideoById("000");
@@ -781,10 +812,12 @@ class SongStorage {
     }
 
     static Load() {
-        console.log(SongStorage.Read());
-
-        // go one by one from array and queue them
-        // if link is a playlist it will call the add playlist function
+        if (SongStorage.IsSaveEmpty()) {
+            return;
+        }
+        let savedSongs = SongStorage.Read();
+        Video.SetVideo(savedSongs[0]);
+        Queue.enable()
     }
 
     static Save(song = Display.GetLinkLabelValue() == "" ? LastSong : Display.GetLinkLabelValue()) {
@@ -815,14 +848,19 @@ class SongStorage {
 
             console.log("Deleting all saved songs");
             localStorage.savedSongs = "";
+            Queue.disable();
             Display.UpdateSavedSongsTable();
 
         } else {
             let savedSongs = SongStorage.Read();
 
-            let indexOfItemToRemove = (el.parentElement.parentElement.children[0].innerHTML) - 1;
+            let itemIndex = (el.parentElement.parentElement.children[0].innerHTML) - 1;
 
-            savedSongs.splice(indexOfItemToRemove, 1)
+            if (itemIndex == Queue.index) {
+                Queue.index--;
+            }
+
+            savedSongs.splice(itemIndex, 1)
 
             SongStorage.Save(savedSongs);
         }
@@ -831,6 +869,20 @@ class SongStorage {
 
     static IsSaveEmpty() {
         return SongStorage.Read().length == 0
+    }
+
+    static PlayNext() {
+        if (!Queue.isEnabled) {
+            return;
+        }
+
+        let savedSongs = SongStorage.Read();
+        if (++Queue.index >= savedSongs.length) {
+            Queue.disable();
+            return;
+        }
+
+        Video.SetVideo(savedSongs[Queue.index])
     }
 }
 
