@@ -870,7 +870,7 @@ class SongStorage {
         if (Display.GetLinkLabelValue() == "") {
             song = Queue.LastSong
         } else {
-            Display.GetLinkLabelValue()
+            song = Display.GetLinkLabelValue()
         }
 
         const saveBehaviours = {
