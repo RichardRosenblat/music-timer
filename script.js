@@ -2,18 +2,34 @@
 //not working video url: https://youtu.be/ETEg-SB01QY
 
 const SAVE_SEPARATOR = "###"
-var LastSong = "https://www.youtube.com/watch?v=MkQW5xr9iGc";
 var ApplicationState = "idle";
 var Queue = {
-    isEnabled: false,
-    index: 0,
-    disable: function () {
-        this.isEnabled = false;
-        this.index = 0;
+    LastSong: "",
+    IsEnabled: false,
+    Index: 0,
+    Disable: function () {
+        Queue.IsEnabled = false;
+        Queue.Index = 0;
+        Display.ClearPlayingNow();
     },
-    enable: function (index = 0) {
-        this.isEnabled = true;
-        this.index = index;
+    Enable: function (index = 0) {
+        Queue.IsEnabled = true;
+        Queue.Index = index;
+        Display.SetPlayingNow(index);
+    },
+    Next: function () {
+        if (!Queue.IsEnabled) {
+            return;
+        }
+        
+        let savedSongs = SongStorage.Read();
+        if (++Queue.Index >= savedSongs.length) {
+            Queue.Disable();
+            return;
+        }
+
+        Video.SetVideo(savedSongs[Queue.Index])
+        Display.SetPlayingNow(Queue.Index);
     }
 }
 var Player;
@@ -26,7 +42,7 @@ function onYouTubeIframeAPIReady() {
 }
 class Application {
     static Load() {
-        SongStorage.CreateSaveStorageIfInexistent();
+        SongStorage.Create();
         Sounds.LoadAlarm();
         Video.LoadIframeAPI();
         Display.UpdateSavedSongsTable();
@@ -149,7 +165,17 @@ class Buttons {
         }
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
     }
+    static UpdateSaveButton() {
+        let linkLabel = document.getElementById("link-label");
+        let saveButton = document.getElementById("save_button");
 
+        if (linkLabel.value == "" && Queue.LastSong == "") {
+            saveButton.disabled = true;
+            return;
+        }
+
+        saveButton.disabled = false;
+    }
     static OpenSongLink(el) {
         window.open(el.innerHTML, '_blank')
     }
@@ -493,7 +519,7 @@ class Display {
         createNewTable();
 
         function hideTableIfSaveEmpty() {
-            if (SongStorage.IsSaveEmpty()) {
+            if (SongStorage.IsEmpty()) {
                 Display.HideSavesTable();
             } else {
                 Display.ShowSavesTable();
@@ -512,10 +538,8 @@ class Display {
                 row.appendChild(createImageCell(savedSong));
                 row.appendChild(createLinkCell(savedSong));
                 row.appendChild(createRemoveCell());
-
                 row.addEventListener("dblclick", () => {
-                    Queue.enable(i);
-                    Video.SetVideo(savedSong);
+                    Video.SetVideoWithQueue(savedSong, i);
                 });
 
                 tableBody.appendChild(row);
@@ -619,6 +643,22 @@ class Display {
     static ShowSavesTable() {
         document.getElementById("saves-table-div").classList.remove("hidden");
     }
+
+    static SetPlayingNow(index){
+        let tableRows = document.getElementById("saves-table-body").children;
+
+        Display.ClearPlayingNow(tableRows);
+
+        tableRows[index].classList.add("playing-now")
+    }
+
+    static ClearPlayingNow() {
+        let tableRows = document.getElementById("saves-table-body").children;
+        for (let i = 0; i < tableRows.length; i++) {
+            const element = tableRows[i];
+            element.classList.remove("playing-now");
+        }
+    }
 }
 
 class Video {
@@ -647,7 +687,7 @@ class Video {
 
     static OnPlayerStateChange(playerState) {
         if (playerState == YT.PlayerState.ENDED) {
-            SongStorage.PlayNext();
+            Queue.Next();
         }
     }
 
@@ -678,14 +718,19 @@ class Video {
         return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
     }
 
-    static SetVideoWithoutQueue() {
-        Queue.disable();
-        Video.SetVideo()
+    static SetVideoWithoutQueue(link) {
+        Queue.Disable();
+        link == undefined ? Video.SetVideo() : Video.SetVideo(link);
+        Buttons.UpdateSaveButton();
+    }
+    static SetVideoWithQueue(link, index) {
+        Video.SetVideoWithoutQueue(link)
+        index == undefined ? Queue.Enable() : Queue.Enable(index);
     }
 
     static SetVideo(link = Display.GetLinkLabelValue()) {
 
-        LastSong = link;
+        Queue.LastSong = link;
 
         const linkType = Video.getVideoType(link);
         const id = Video.getVideoId(link, linkType);
@@ -713,13 +758,13 @@ class Video {
 
         linkTypeBehaviours[linkType]();
 
-        if (!Queue.isEnabled) {
+        if (!Queue.IsEnabled) {
             let videoStateChecker = setInterval(() => {
                 if (ApplicationState != 'playing' && Player.getPlayerState() === YT.PlayerState.PLAYING) {
                     Video.StopVideo();
                     clearInterval(videoStateChecker);
                 }
-            }, 10);    
+            }, 10);
         }
 
         Display.ClearLinkLabel();
@@ -777,7 +822,7 @@ class Video {
 
     static VideoErrorHandler(errorCode) {
         Display.ShowVideoError(errorCode);
-        SongStorage.PlayNext();
+        Queue.Next();
     }
 
     static ClearVideo() {
@@ -798,7 +843,8 @@ class Sounds {
 }
 
 class SongStorage {
-    static CreateSaveStorageIfInexistent() {
+
+    static Create() {
         if (localStorage.savedSongs == null) {
             localStorage.savedSongs = "";
         }
@@ -812,15 +858,21 @@ class SongStorage {
     }
 
     static Load() {
-        if (SongStorage.IsSaveEmpty()) {
+        if (SongStorage.IsEmpty()) {
             return;
         }
         let savedSongs = SongStorage.Read();
-        Video.SetVideo(savedSongs[0]);
-        Queue.enable()
+        Video.SetVideoWithQueue(savedSongs[0])
     }
 
-    static Save(song = Display.GetLinkLabelValue() == "" ? LastSong : Display.GetLinkLabelValue()) {
+    static Save(song) {
+        
+        if (Display.GetLinkLabelValue() == "") {
+            song = Queue.LastSong
+        } else {
+            Display.GetLinkLabelValue()
+        }
+
         const saveBehaviours = {
             'object': () => {
                 song.push("");
@@ -848,7 +900,7 @@ class SongStorage {
 
             console.log("Deleting all saved songs");
             localStorage.savedSongs = "";
-            Queue.disable();
+            Queue.Disable();
             Display.UpdateSavedSongsTable();
 
         } else {
@@ -856,8 +908,8 @@ class SongStorage {
 
             let itemIndex = (el.parentElement.parentElement.children[0].innerHTML) - 1;
 
-            if (itemIndex == Queue.index) {
-                Queue.index--;
+            if (itemIndex >= Queue.Index) {
+                Queue.Index--;
             }
 
             savedSongs.splice(itemIndex, 1)
@@ -867,23 +919,11 @@ class SongStorage {
 
     }
 
-    static IsSaveEmpty() {
+    static IsEmpty() {
         return SongStorage.Read().length == 0
     }
 
-    static PlayNext() {
-        if (!Queue.isEnabled) {
-            return;
-        }
 
-        let savedSongs = SongStorage.Read();
-        if (++Queue.index >= savedSongs.length) {
-            Queue.disable();
-            return;
-        }
-
-        Video.SetVideo(savedSongs[Queue.index])
-    }
 }
 
 class Help {

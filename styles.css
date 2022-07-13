@@ -15,7 +15,7 @@
 }
 
 body {
-    background-color: #bcdddf;
+    background-color: #bcdddf !important;
 }
 
 .main {
@@ -86,10 +86,6 @@ body {
     zoom: 125%;
 }
 
-.disclaimer {
-    color: #2d504d;
-}
-
 .overtimed{
     color:#8b3838
 }
@@ -103,4 +99,8 @@ body {
     margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.playing-now{
+    background-color: #07ff6e49 !important;
 }
