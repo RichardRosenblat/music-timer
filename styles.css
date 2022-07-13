@@ -15,7 +15,7 @@
 }
 
 body {
-    background-color: #bcdddf;
+    background-color: #bcdddf !important;
 }
 
 .main {
@@ -62,7 +62,7 @@ body {
     filter: invert(1);
 }
 
-.invalid_video {
+.video_error {
     zoom: 50%;
     border-radius: 25px;
     border: 5px solid #903139;
@@ -86,10 +86,21 @@ body {
     zoom: 125%;
 }
 
-.disclaimer {
-    color: #2d504d;
-}
-
 .overtimed{
     color:#8b3838
+}
+
+.center{
+    text-align: center;
+}
+
+.table-div{
+    width: 50%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.playing-now{
+    background-color: #07ff6e49 !important;
 }
