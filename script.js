@@ -3,6 +3,7 @@
 
 const SAVE_SEPARATOR = "###"
 var ApplicationState = "idle";
+var RemainingTime = 0;
 var Queue = {
     LastSong: "",
     IsEnabled: false,
@@ -21,7 +22,7 @@ var Queue = {
         if (!Queue.IsEnabled) {
             return;
         }
-        
+
         let savedSongs = SongStorage.Read();
         if (++Queue.Index >= savedSongs.length) {
             Queue.Disable();
@@ -644,7 +645,7 @@ class Display {
         document.getElementById("saves-table-div").classList.remove("hidden");
     }
 
-    static SetPlayingNow(index){
+    static SetPlayingNow(index) {
         let tableRows = document.getElementById("saves-table-body").children;
 
         Display.ClearPlayingNow(tableRows);
@@ -866,13 +867,16 @@ class SongStorage {
     }
 
     static Save(song) {
-        
-        if (Display.GetLinkLabelValue() == "") {
-            song = Queue.LastSong
-        } else {
-            song = Display.GetLinkLabelValue()
-        }
+        console.log(song);
 
+        if (song === undefined){
+            if (Display.GetLinkLabelValue() == "") {
+                song = Queue.LastSong
+            } else {
+                song = Display.GetLinkLabelValue()
+            }
+        }
+            
         const saveBehaviours = {
             'object': () => {
                 song.push("");
@@ -908,7 +912,7 @@ class SongStorage {
 
             let itemIndex = (el.parentElement.parentElement.children[0].innerHTML) - 1;
 
-            if (itemIndex >= Queue.Index) {
+            if (Queue.Index >= itemIndex && Queue.IsEnabled) {
                 Queue.Index--;
             }
 
