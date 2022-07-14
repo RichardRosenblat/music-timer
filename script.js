@@ -446,29 +446,33 @@ class Display {
 
     static ShowVideoError(errorCode) {
         const videoErrorAlert = document.getElementById("video_error")
-
+        let miliseconds;
         switch (errorCode) {
             case 150:
             case 101:
                 videoErrorAlert.innerHTML = "The owner of the video does not allow it to be embedded!"
+                miliseconds = 9000
                 break;
             case 100:
                 videoErrorAlert.innerHTML = "Video not found!"
+                miliseconds = 5000
                 break;
             case 5:
                 videoErrorAlert.innerHTML = "This video cannot be played on website players!"
+                miliseconds = 9000
                 break;
             case 2:
                 return;
             default:
                 videoErrorAlert.innerHTML = "Invalid youtube video!"
+                miliseconds = 5000
                 break;
         }
 
         videoErrorAlert.classList.remove("hidden")
         setTimeout(function () {
             Display.HideVideoError();
-        }, 3000);
+        }, miliseconds);
     }
     static HideVideoError() {
         document.getElementById("video_error").classList.add("hidden")
@@ -755,7 +759,7 @@ class Video {
                 Display.HideVideoError();
             },
             "invalid": () => {
-                Video.VideoErrorHandler(2);
+                Video.VideoErrorHandler(0);
             }
         }
 
