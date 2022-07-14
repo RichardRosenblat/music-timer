@@ -109,7 +109,6 @@ class States {
             },
             "overtimed": function () {
                 States.ChangeStatesTo("paused");
-                Display.LockDisplayForKeyboard();
             },
             "paused": function () {
                 if (Time.IsTimerOvertimed()) {
@@ -256,6 +255,8 @@ class Input {
                 document.getElementById("set-video-button").click();
             }
             return;
+        } else if (key == " ") {
+            e.preventDefault();
         }
 
         try {
@@ -330,18 +331,18 @@ class Time {
         this.AlterSeconds(value * 60);
     }
     static AlterSeconds(value) {
-        if (ApplicationState != "overtimed") {
-            if (RemainingTime + value <= 0) {
-                RemainingTime = 0;
-            } else {
-                RemainingTime += value;
-            }
-        } else {
+        if (Time.IsTimerOvertimed()) {
             if (RemainingTime - value <= 0) {
                 RemainingTime = (RemainingTime - value) * -1;
                 States.ChangeStatesTo("playing");
             } else {
                 RemainingTime -= value;
+            }
+        } else {
+            if (RemainingTime + value <= 0) {
+                RemainingTime = 0;
+            } else {
+                RemainingTime += value;
             }
         }
         Display.UpdateDisplays();
@@ -458,6 +459,7 @@ class Display {
                 videoErrorAlert.innerHTML = "This video cannot be played on website players!"
                 break;
             case 2:
+                return;
             default:
                 videoErrorAlert.innerHTML = "Invalid youtube video!"
                 break;
@@ -866,17 +868,8 @@ class SongStorage {
         Video.SetVideoWithQueue(savedSongs[0])
     }
 
-    static Save(song) {
-        console.log(song);
+    static Save(song = Display.GetLinkLabelValue() == "" ? Queue.LastSong : Display.GetLinkLabelValue()) {
 
-        if (song === undefined){
-            if (Display.GetLinkLabelValue() == "") {
-                song = Queue.LastSong
-            } else {
-                song = Display.GetLinkLabelValue()
-            }
-        }
-            
         const saveBehaviours = {
             'object': () => {
                 song.push("");
