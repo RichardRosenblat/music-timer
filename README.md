@@ -20,13 +20,13 @@ This meeting-focused application allows the user to set videos and play them for
 
 ## How to install and open the project
  1. Clone the project:
-  
+  ```
   git clone https://github.com/RichardRosenblat/music-timer.git
-
+  ```
  2. Open project using the editing tool of your preference (E.g. Visual Studio code):
-  
+  ```
   code .
-
+  ```
  
 ## Features
  >Please be aware, some features are *still in development*, so no image shown here will necessarily represent the final product.
