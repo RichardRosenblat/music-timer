@@ -11,11 +11,11 @@ This meeting-focused application allows the user to set videos and play them for
   - [How to install and open the project](#how-to-install-and-open-the-project)
   - [Features](#features)
     - [Timer](#timer)
-    - [Timer Control](#timer-control)
+      - [Timer Control](#timer-control)
     - [Video Player](#video-player)
-    - [Video Player control](#video-player-control)
+      - [Video Player control](#video-player-control)
     - [Save and Load](#save-and-load)
-    - [Save and Load control](#save-and-load-control)
+      - [Save and Load control](#save-and-load-control)
   - [Author / Support](#author--support)
 
 ## How to install and open the project
