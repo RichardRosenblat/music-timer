@@ -17,7 +17,7 @@
     <div class="main">
         <div class="text-center">
             <div id="display_div" class="d-flex justify-content-center m-4 over">
-                <h1 id="display-negative" class="hidden">-</h1>
+                <h1 id="display_negative" class="hidden">-</h1>
                 <h1 id="display_hours" class="hidden">00</h1>
                 <h1 id="display_secret" class="mx-1 hidden">:</h1>
                 <h1 id="display_minutes">00</h1>
@@ -55,10 +55,10 @@
         </div>
         <div class="text-center input-div">
             <div class="input-group my-3 label">
-                <input id="link-label" type="text" class="form-control" placeholder="Youtube Link"
+                <input id="link_label" type="text" class="form-control" placeholder="Youtube Link"
                     aria-label="Youtube Link" oninput="Buttons.UpdateSaveButton()">
                 <div class="input-group-append display-flex">
-                    <button id="set-video-button" class="corners-tl-bl-pointy btn btn-success"
+                    <button id="set_video_button" class="corners-tl-bl-pointy btn btn-success"
                         onclick="Video.SetVideoWithoutQueue()" type="button">Set</button>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                 <button class="btn btn-danger" onclick="SongStorage.Delete()" id="delete_button" type="button">Delete
                     save</button>
             </div>
-            <div id="saves-table-div" class="table-div">
+            <div id="saves_table_div" class="table-div">
                 <table class="table table-striped table-hover table-bordered table-dark">
                     <thead>
                         <tr>
@@ -96,7 +96,7 @@
                             <th scope="col">Remove</th>
                         </tr>
                     </thead>
-                    <tbody id="saves-table-body">
+                    <tbody id="saves_table_body">
                     </tbody>
                 </table>
             </div>

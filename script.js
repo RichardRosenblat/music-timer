@@ -166,7 +166,7 @@ class Buttons {
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
     }
     static UpdateSaveButton() {
-        let linkLabel = document.getElementById("link-label");
+        let linkLabel = document.getElementById("link_label");
         let saveButton = document.getElementById("save_button");
 
         if (linkLabel.value == "" && Queue.LastSong == "") {
@@ -250,9 +250,9 @@ class Input {
 
         const key = e.key;
 
-        if (document.getElementById("link-label") === document.activeElement) {
+        if (document.getElementById("link_label") === document.activeElement) {
             if (key == "Enter") {
-                document.getElementById("set-video-button").click();
+                document.getElementById("set_video_button").click();
             }
             return;
         } else if (key == " ") {
@@ -479,7 +479,7 @@ class Display {
     }
 
     static ClearLinkLabel() {
-        document.getElementById("link-label").value = "";
+        document.getElementById("link_label").value = "";
     }
 
     static HidePlayer() {
@@ -505,14 +505,14 @@ class Display {
     }
 
     static ShowNegativeSign() {
-        document.getElementById("display-negative").classList.remove("hidden");
+        document.getElementById("display_negative").classList.remove("hidden");
     }
     static HideNegativeSign() {
-        document.getElementById("display-negative").classList.add("hidden");
+        document.getElementById("display_negative").classList.add("hidden");
     }
 
     static GetLinkLabelValue() {
-        return document.getElementById("link-label").value;
+        return document.getElementById("link_label").value;
     }
 
     static UpdateSavedSongsTable() {
@@ -645,10 +645,10 @@ class Display {
     }
 
     static HideSavesTable() {
-        document.getElementById("saves-table-div").classList.add("hidden");
+        document.getElementById("saves_table_div").classList.add("hidden");
     }
     static ShowSavesTable() {
-        document.getElementById("saves-table-div").classList.remove("hidden");
+        document.getElementById("saves_table_div").classList.remove("hidden");
     }
 
     static SetPlayingNow(index) {
