@@ -1,45 +1,10 @@
 //working video url: https://www.youtube.com/watch?v=MkQW5xr9iGc
 //not working video url: https://youtu.be/ETEg-SB01QY
 
-const SAVE_SEPARATOR = "###"
-var ApplicationState = "idle";
-var RemainingTime = 0;
-var Queue = {
-    LastSong: "",
-    IsEnabled: false,
-    Index: 0,
-    Disable: function () {
-        Queue.IsEnabled = false;
-        Queue.Index = 0;
-        Display.ClearPlayingNow();
-    },
-    Enable: function (index = 0) {
-        Queue.IsEnabled = true;
-        Queue.Index = index;
-        Display.SetPlayingNow(index);
-    },
-    Next: function () {
-        if (!Queue.IsEnabled) {
-            return;
-        }
-
-        let savedSongs = SongStorage.Read();
-        if (++Queue.Index >= savedSongs.length) {
-            Queue.Disable();
-            return;
-        }
-        Display.UpdatePlayingNow();
-        Video.SetVideo(savedSongs[Queue.Index])
-    }
-}
-var Player;
-var TimerId;
-var Alarm;
-
-
 function onYouTubeIframeAPIReady() {
     Video.CreatePlayer();
 }
+
 const Application = {
     Load: () => {
         SongStorage.Create();
@@ -50,6 +15,7 @@ const Application = {
 }
 
 const States = {
+    ApplicationState: "idle",
     ChangeStatesTo: (state) => {
 
         const StatesChangeActions = {
@@ -62,7 +28,7 @@ const States = {
                 Video.PauseVideo();
                 Display.SetDefaultTitle();
                 Display.HideOvertimeDisplay();
-                ApplicationState = "idle";
+                States.ApplicationState = "idle";
             },
             "playing": function () {
                 Display.HideOvertimeDisplay();
@@ -72,7 +38,7 @@ const States = {
                 Time.StartTimer();
                 Display.HideNegativeSign();
                 Video.PlayVideo();
-                ApplicationState = "playing";
+                States.ApplicationState = "playing";
             },
             "overtimed": function () {
                 Buttons.SetPauseButton();
@@ -83,14 +49,14 @@ const States = {
                 Sounds.PlayAlarm();
                 Display.ShowOvertimeDisplay();
                 Display.ShowNegativeSign();
-                ApplicationState = "overtimed";
+                States.ApplicationState = "overtimed";
             },
             "paused": function () {
                 Buttons.SetResumeButton();
                 Display.UnlockDisplayForKeyboard();
                 Time.StopTimer();
                 Video.PauseVideo();
-                ApplicationState = "paused";
+                States.ApplicationState = "paused";
             }
         };
         StatesChangeActions[state]();
@@ -116,7 +82,7 @@ const States = {
                 States.ChangeStatesTo("playing");
             }
         };
-        stateChange[ApplicationState]();
+        stateChange[States.ApplicationState]();
     }
 }
 
@@ -167,7 +133,7 @@ const Buttons = {
         let linkLabel = document.getElementById("link_label");
         let saveButton = document.getElementById("save_button");
 
-        if (linkLabel.value == "" && Queue.LastSong == "") {
+        if (linkLabel.value == "" && SongStorage.Queue.LastSong == "") {
             saveButton.disabled = true;
             return;
         }
@@ -314,7 +280,7 @@ const Input = {
 
             function setRemainingTime(hours, minutes, seconds) {
 
-                RemainingTime = (hours * 3600) + (minutes * 60) + seconds;
+                Time.RemainingTime = (hours * 3600) + (minutes * 60) + seconds;
 
                 Display.UpdateDisplays();
             }
@@ -323,42 +289,44 @@ const Input = {
 }
 
 const Time = {
+    TimerId: 0,
+    RemainingTime: 0,
     AlterMinutes: (value) => {
         Time.AlterSeconds(value * 60);
     },
     AlterSeconds: (value) => {
         if (Time.IsTimerOvertimed()) {
-            if (RemainingTime - value <= 0) {
-                RemainingTime = (RemainingTime - value) * -1;
+            if (Time.RemainingTime - value <= 0) {
+                Time.RemainingTime = (Time.RemainingTime - value) * -1;
                 States.ChangeStatesTo("playing");
             } else {
-                RemainingTime -= value;
+                Time.RemainingTime -= value;
             }
         } else {
-            if (RemainingTime + value <= 0) {
-                RemainingTime = 0;
+            if (Time.RemainingTime + value <= 0) {
+                Time.RemainingTime = 0;
             } else {
-                RemainingTime += value;
+                Time.RemainingTime += value;
             }
         }
         Display.UpdateDisplays();
     },
     StartTimer: () => {
-        TimerId = setInterval(() => {
-            if (ApplicationState != "overtimed" && --RemainingTime <= 0) {
+        Time.TimerId = setInterval(() => {
+            if (States.ApplicationState != "overtimed" && --Time.RemainingTime <= 0) {
                 Time.ClearTimer();
                 States.ChangeStatesTo("overtimed");
-            } else if (ApplicationState == "overtimed") {
-                RemainingTime++;
+            } else if (States.ApplicationState == "overtimed") {
+                Time.RemainingTime++;
             }
             Display.UpdateDisplays();
         }, 1000);
     },
     StopTimer: () => {
-        clearInterval(TimerId);
+        clearInterval(Time.TimerId);
     },
     ClearTimer: () => {
-        RemainingTime = 0;
+        Time.RemainingTime = 0;
     },
     IsTimerOvertimed: () => {
         return Display.HasDisplayOvertime();
@@ -368,13 +336,13 @@ const Time = {
 const Display = {
     UpdateDisplays() {
 
-        if (ApplicationState == 'playing') {
+        if (States.ApplicationState == 'playing') {
             Video.PlayVideo();
         }
 
-        let hours = parseInt(RemainingTime / 3600, 10);
-        let minutes = parseInt((RemainingTime / 60) % 60, 10);
-        let seconds = parseInt(RemainingTime % 60, 10);
+        let hours = parseInt(Time.RemainingTime / 3600, 10);
+        let minutes = parseInt((Time.RemainingTime / 60) % 60, 10);
+        let seconds = parseInt(Time.RemainingTime % 60, 10);
 
         const display_secret = document.getElementById("display_secret");
 
@@ -408,7 +376,7 @@ const Display = {
         }
 
         function updateTitleDisplay() {
-            if (ApplicationState == 'idle') {
+            if (States.ApplicationState == 'idle') {
                 return;
             }
             let newTitle = "Music Timer (" +
@@ -635,10 +603,10 @@ const Display = {
         document.getElementById("saves_table_div").classList.remove("hidden");
     },
     UpdatePlayingNow() {
-        if (!Queue.IsEnabled) {
+        if (!SongStorage.Queue.IsEnabled) {
             return;
         }
-        Display.SetPlayingNow(Queue.Index);
+        Display.SetPlayingNow(SongStorage.Queue.Index);
     },
     SetPlayingNow(index) {
         let tableRows = document.getElementById("saves_table_body").children;
@@ -657,6 +625,7 @@ const Display = {
 }
 
 const Video = {
+    Player: undefined,
     LoadIframeAPI() {
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -664,7 +633,7 @@ const Video = {
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     },
     CreatePlayer() {
-        Player = new YT.Player('player', {
+        Video.Player = new YT.Player('player', {
             height: '360',
             width: '640',
             events: {
@@ -680,46 +649,46 @@ const Video = {
     },
     OnPlayerStateChange(playerState) {
         if (playerState == YT.PlayerState.ENDED) {
-            Queue.Next();
+            SongStorage.Queue.Next();
         }
     },
     PlayVideo() {
-        Player.playVideo();
+        Video.Player.playVideo();
     },
     StopVideo() {
-        Player.stopVideo();
+        Video.Player.stopVideo();
     },
     PauseVideo() {
-        Player.pauseVideo();
+        Video.Player.pauseVideo();
     },
     IsMuted() {
-        return Player.isMuted();
+        return Video.Player.isMuted();
     },
     ToggleMute() {
         if (Video.IsMuted()) {
-            Player.unMute();
+            Video.Player.unMute();
         } else {
-            Player.mute();
+            Video.Player.mute();
         }
         Buttons.UpdateMuteButton()
 
 
     },
     HasVideoBeenSet() {
-        return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
+        return !(Video.Player.getVideoUrl() === 'https://www.youtube.com/watch');
     },
     SetVideoWithoutQueue(link) {
-        Queue.Disable();
+        SongStorage.Queue.Disable();
         link === undefined ? Video.SetVideo() : Video.SetVideo(link);
         Buttons.UpdateSaveButton();
     },
     SetVideoWithQueue(link, index) {
         Video.SetVideoWithoutQueue(link)
-        index === undefined ? Queue.Enable() : Queue.Enable(index);
+        index === undefined ? SongStorage.Queue.Enable() : SongStorage.Queue.Enable(index);
     },
     SetVideo(link = Display.GetLinkLabelValue()) {
 
-        Queue.LastSong = link;
+        SongStorage.Queue.LastSong = link;
 
         const linkType = Video.getVideoType(link);
         const id = Video.getVideoId(link, linkType);
@@ -728,12 +697,12 @@ const Video = {
         const linkTypeBehaviours = {
             "single": () => {
                 Display.ShowPlayer();
-                Player.loadVideoById(id);
+                Video.Player.loadVideoById(id);
                 Display.HideVideoError()
             },
             "playlist": () => {
                 Display.ShowPlayer();
-                Player.loadPlaylist({
+                Video.Player.loadPlaylist({
                     list: id,
                     listType: "playlist",
                     index: index
@@ -747,9 +716,9 @@ const Video = {
 
         linkTypeBehaviours[linkType]();
 
-        if (!Queue.IsEnabled) {
+        if (!SongStorage.Queue.IsEnabled) {
             let videoStateChecker = setInterval(() => {
-                if (ApplicationState != 'playing' && Player.getPlayerState() === YT.PlayerState.PLAYING) {
+                if (States.ApplicationState != 'playing' && Video.Player.getPlayerState() === YT.PlayerState.PLAYING) {
                     Video.StopVideo();
                     clearInterval(videoStateChecker);
                 }
@@ -807,23 +776,52 @@ const Video = {
     },
     VideoErrorHandler(errorCode) {
         Display.ShowVideoError(errorCode);
-        Queue.Next();
+        SongStorage.Queue.Next();
     },
     ClearVideo() {
-        Player.stopVideo();
-        Player.loadVideoById("000");
+        Video.Player.stopVideo();
+        Video.Player.loadVideoById("000");
         Display.HidePlayer();
     }
 }
 
 const SongStorage = {
+    SAVE_SEPARATOR : "###",
+    Queue: {
+        LastSong: "",
+        IsEnabled: false,
+        Index: 0,
+        Disable() {
+            SongStorage.Queue.IsEnabled = false;
+            SongStorage.Queue.Index = 0;
+            Display.ClearPlayingNow();
+        },
+        Enable(index = 0) {
+            SongStorage.Queue.IsEnabled = true;
+            SongStorage.Queue.Index = index;
+            Display.SetPlayingNow(index);
+        },
+        Next() {
+            if (!SongStorage.Queue.IsEnabled) {
+                return;
+            }
+
+            let savedSongs = SongStorage.Read();
+            if (++SongStorage.Queue.Index >= savedSongs.length) {
+                SongStorage.Queue.Disable();
+                return;
+            }
+            Display.UpdatePlayingNow();
+            Video.SetVideo(savedSongs[SongStorage.Queue.Index])
+        }
+    },
     Create() {
         if (localStorage.savedSongs == null) {
             localStorage.savedSongs = "";
         }
     },
     Read() {
-        let result = localStorage.savedSongs.split(SAVE_SEPARATOR);
+        let result = localStorage.savedSongs.split(SongStorage.SAVE_SEPARATOR);
         result.pop();
 
         return result;
@@ -835,15 +833,15 @@ const SongStorage = {
         let savedSongs = SongStorage.Read();
         Video.SetVideoWithQueue(savedSongs[0])
     },
-    Save(song = Display.GetLinkLabelValue() == "" ? Queue.LastSong : Display.GetLinkLabelValue()) {
+    Save(song = Display.GetLinkLabelValue() == "" ? SongStorage.Queue.LastSong : Display.GetLinkLabelValue()) {
 
         const saveBehaviours = {
             'object': () => {
                 song.push("");
-                localStorage.savedSongs = song.join(SAVE_SEPARATOR);
+                localStorage.savedSongs = song.join(SongStorage.SAVE_SEPARATOR);
             },
             'string': () => {
-                localStorage.savedSongs += song + SAVE_SEPARATOR;
+                localStorage.savedSongs += song + SongStorage.SAVE_SEPARATOR;
             }
         };
 
@@ -863,7 +861,7 @@ const SongStorage = {
 
             console.log("Deleting all saved songs");
             localStorage.savedSongs = "";
-            Queue.Disable();
+            SongStorage.Queue.Disable();
             Display.UpdateSavedSongsTable();
 
         } else {
@@ -871,8 +869,8 @@ const SongStorage = {
 
             let itemIndex = (el.parentElement.parentElement.children[0].innerHTML) - 1;
 
-            if (Queue.Index >= itemIndex && Queue.IsEnabled) {
-                Queue.Index--;
+            if (SongStorage.Queue.Index >= itemIndex && SongStorage.Queue.IsEnabled) {
+                SongStorage.Queue.Index--;
             }
 
             savedSongs.splice(itemIndex, 1)
@@ -887,11 +885,12 @@ const SongStorage = {
 }
 
 const Sounds = {
+    Alarm: undefined,
     LoadAlarm() {
-        Alarm = new Audio('./assets/audio/ringtone.mp3');
+        Sounds.Alarm = new Audio('./assets/audio/ringtone.mp3');
     },
     PlayAlarm() {
-        Alarm.play();
+        Sounds.Alarm.play();
     }
 }
 
