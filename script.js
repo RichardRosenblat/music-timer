@@ -159,7 +159,7 @@ class Buttons {
         if (Video.HasVideoBeenSet()) {
             document.getElementById("mute_sound_button").disabled = false;
         }
-        if (!(Video.IsMuted() || Video.IsMuted() == undefined)) {
+        if (!(Video.IsMuted() || Video.IsMuted() === undefined)) {
             document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
             return;
         }
@@ -185,65 +185,65 @@ class Input {
 
     static RecieveInput(e) {
         const keyboardShortcuts = {
-            "ArrowRight": function () {
+            "ArrowRight": () => {
                 Time.AlterSeconds(30)
             },
-            "ArrowLeft": function () {
+            "ArrowLeft": () => {
                 Time.AlterSeconds(-30)
             },
-            "ArrowUp": function () {
+            "ArrowUp": () => {
                 Time.AlterMinutes(1)
             },
-            "ArrowDown": function () {
+            "ArrowDown": () => {
                 Time.AlterMinutes(-1)
             },
-            "PageUp": function () {
+            "PageUp": () => {
                 Time.AlterMinutes(5)
             },
-            "PageDown": function () {
+            "PageDown": () => {
                 Time.AlterMinutes(-5)
             },
-            "Home": function () {
+            "Home": () => {
                 Time.AlterMinutes(10)
             },
-            "End": function () {
+            "End": () => {
                 Time.AlterMinutes(-10)
             },
-            "Enter": function () {
+            "Enter": () => {
                 States.CycleStates()
             },
-            "Delete": function () {
+            "Delete": () => {
                 States.ChangeStatesTo("idle")
             },
-            " ": function () {
+            " ": () => {
                 States.CycleStates()
             },
 
-            "d": function () {
+            "d": () => {
                 Time.AlterSeconds(30)
             },
-            "a": function () {
+            "a": () => {
                 Time.AlterSeconds(-30)
             },
-            "w": function () {
+            "w": () => {
                 Time.AlterMinutes(1)
             },
-            "s": function () {
+            "s": () => {
                 Time.AlterMinutes(-1)
             },
-            "e": function () {
+            "e": () => {
                 Time.AlterMinutes(5)
             },
-            "q": function () {
+            "q": () => {
                 Time.AlterMinutes(-5)
             },
-            "r": function () {
+            "r": () => {
                 Time.AlterMinutes(10)
             },
-            "f": function () {
+            "f": () => {
                 Time.AlterMinutes(-10)
             },
-            "Escape": function () {
+            "Escape": () => {
                 States.ChangeStatesTo("idle")
             },
         };
@@ -255,12 +255,11 @@ class Input {
                 document.getElementById("set_video_button").click();
             }
             return;
-        } else if (key == " ") {
-            e.preventDefault();
         }
 
         try {
             keyboardShortcuts[key]();
+            e.preventDefault();
             return;
         } catch (err) {
             recieveKeyboardInput(key);
@@ -516,7 +515,7 @@ class Display {
     }
 
     static UpdateSavedSongsTable() {
-        let tableBody = document.getElementById("saves-table-body");
+        let tableBody = document.getElementById("saves_table_body");
         let savedSongs = SongStorage.Read();
 
         deletePreviousTable();
@@ -534,7 +533,7 @@ class Display {
         }
 
         function deletePreviousTable() {
-            document.getElementById("saves-table-body").replaceChildren();
+            document.getElementById("saves_table_body").replaceChildren();
         }
 
         function createNewTable() {
@@ -652,7 +651,7 @@ class Display {
     }
 
     static SetPlayingNow(index) {
-        let tableRows = document.getElementById("saves-table-body").children;
+        let tableRows = document.getElementById("saves_table_body").children;
 
         Display.ClearPlayingNow(tableRows);
 
@@ -660,7 +659,7 @@ class Display {
     }
 
     static ClearPlayingNow() {
-        let tableRows = document.getElementById("saves-table-body").children;
+        let tableRows = document.getElementById("saves_table_body").children;
         for (let i = 0; i < tableRows.length; i++) {
             const element = tableRows[i];
             element.classList.remove("playing-now");
@@ -727,12 +726,12 @@ class Video {
 
     static SetVideoWithoutQueue(link) {
         Queue.Disable();
-        link == undefined ? Video.SetVideo() : Video.SetVideo(link);
+        link === undefined ? Video.SetVideo() : Video.SetVideo(link);
         Buttons.UpdateSaveButton();
     }
     static SetVideoWithQueue(link, index) {
         Video.SetVideoWithoutQueue(link)
-        index == undefined ? Queue.Enable() : Queue.Enable(index);
+        index === undefined ? Queue.Enable() : Queue.Enable(index);
     }
 
     static SetVideo(link = Display.GetLinkLabelValue()) {
