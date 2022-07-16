@@ -28,9 +28,8 @@ var Queue = {
             Queue.Disable();
             return;
         }
-
+        Display.UpdatePlayingNow();
         Video.SetVideo(savedSongs[Queue.Index])
-        Display.SetPlayingNow(Queue.Index);
     }
 }
 var Player;
@@ -41,8 +40,8 @@ var Alarm;
 function onYouTubeIframeAPIReady() {
     Video.CreatePlayer();
 }
-class Application {
-    static Load() {
+const Application = {
+    Load: () => {
         SongStorage.Create();
         Sounds.LoadAlarm();
         Video.LoadIframeAPI();
@@ -50,8 +49,8 @@ class Application {
     }
 }
 
-class States {
-    static ChangeStatesTo(state) {
+const States = {
+    ChangeStatesTo: (state) => {
 
         const StatesChangeActions = {
             "idle": function () {
@@ -97,9 +96,8 @@ class States {
         StatesChangeActions[state]();
         Buttons.BlurButtons();
         Display.UpdateDisplays();
-    }
-
-    static CycleStates() {
+    },
+    CycleStates: () => {
         const stateChange = {
             "idle": function () {
                 States.ChangeStatesTo("playing");
@@ -122,30 +120,30 @@ class States {
     }
 }
 
-class Buttons {
-    static SetStartButton() {
+const Buttons = {
+    SetStartButton: () => {
         document.getElementById("start").innerHTML = "Start";
         document.getElementById("start").classList.add("btn-primary");
         document.getElementById("start").classList.remove("btn-success");
         document.getElementById("start").classList.remove("btn-secondary");
-    }
-    static SetResumeButton() {
+    },
+    SetResumeButton: () => {
         document.getElementById("start").innerHTML = "Resume";
         document.getElementById("start").classList.remove("btn-primary");
         document.getElementById("start").classList.add("btn-success");
         document.getElementById("start").classList.remove("btn-secondary");
-    }
-    static SetPauseButton() {
+    },
+    SetPauseButton: () => {
         document.getElementById("start").innerHTML = "Pause";
         document.getElementById("start").classList.remove("btn-primary");
         document.getElementById("start").classList.remove("btn-success");
         document.getElementById("start").classList.add("btn-secondary");
-    }
-    static BlurButtons() {
+    },
+    BlurButtons: () => {
         document.getElementById("start").blur();
         document.getElementById("clear").blur();
-    }
-    static UpdateHideButton() {
+    },
+    UpdateHideButton: () => {
         if (Video.HasVideoBeenSet()) {
             document.getElementById("hide_show_button").disabled = false;
         }
@@ -154,8 +152,8 @@ class Buttons {
             return;
         }
         document.getElementById("hide_show_img").src = "./assets/images/hide.png";
-    }
-    static UpdateMuteButton() {
+    },
+    UpdateMuteButton: () => {
         if (Video.HasVideoBeenSet()) {
             document.getElementById("mute_sound_button").disabled = false;
         }
@@ -164,8 +162,8 @@ class Buttons {
             return;
         }
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
-    }
-    static UpdateSaveButton() {
+    },
+    UpdateSaveButton: () => {
         let linkLabel = document.getElementById("link_label");
         let saveButton = document.getElementById("save_button");
 
@@ -175,15 +173,14 @@ class Buttons {
         }
 
         saveButton.disabled = false;
-    }
-    static OpenSongLink(el) {
+    },
+    OpenSongLink: (el) => {
         window.open(el.innerHTML, '_blank')
     }
 }
 
-class Input {
-
-    static RecieveInput(e) {
+const Input = {
+    RecieveInput: (e) => {
         const keyboardShortcuts = {
             "ArrowRight": () => {
                 document.getElementById("atb_+30s").click();
@@ -325,11 +322,11 @@ class Input {
     }
 }
 
-class Time {
-    static AlterMinutes(value) {
-        this.AlterSeconds(value * 60);
-    }
-    static AlterSeconds(value) {
+const Time = {
+    AlterMinutes: (value) => {
+        Time.AlterSeconds(value * 60);
+    },
+    AlterSeconds: (value) => {
         if (Time.IsTimerOvertimed()) {
             if (RemainingTime - value <= 0) {
                 RemainingTime = (RemainingTime - value) * -1;
@@ -345,9 +342,8 @@ class Time {
             }
         }
         Display.UpdateDisplays();
-    }
-
-    static StartTimer() {
+    },
+    StartTimer: () => {
         TimerId = setInterval(() => {
             if (ApplicationState != "overtimed" && --RemainingTime <= 0) {
                 Time.ClearTimer();
@@ -357,22 +353,20 @@ class Time {
             }
             Display.UpdateDisplays();
         }, 1000);
-    }
-    static StopTimer() {
+    },
+    StopTimer: () => {
         clearInterval(TimerId);
-    }
-    static ClearTimer() {
+    },
+    ClearTimer: () => {
         RemainingTime = 0;
-    }
-
-    static IsTimerOvertimed() {
+    },
+    IsTimerOvertimed: () => {
         return Display.HasDisplayOvertime();
     }
 }
 
-class Display {
-
-    static UpdateDisplays() {
+const Display = {
+    UpdateDisplays() {
 
         if (ApplicationState == 'playing') {
             Video.PlayVideo();
@@ -425,25 +419,22 @@ class Display {
 
             document.querySelector('title').textContent = newTitle;
         }
-    }
-
-    static UnlockDisplayForKeyboard() {
+    },
+    UnlockDisplayForKeyboard() {
         document.getElementById("display").classList.remove("locked");
         document.getElementById("lock_image").classList.add("hidden");
-    }
-    static LockDisplayForKeyboard() {
+    },
+    LockDisplayForKeyboard() {
         document.getElementById("display").classList.add("locked");
         document.getElementById("lock_image").classList.remove("hidden");
-    }
-    static IsDisplayLocked() {
+    },
+    IsDisplayLocked() {
         return document.getElementById("display").classList.contains("locked");
-    }
-
-    static SetDefaultTitle() {
+    },
+    SetDefaultTitle() {
         document.querySelector('title').textContent = 'Music Timer';
-    }
-
-    static ShowVideoError(errorCode) {
+    },
+    ShowVideoError(errorCode) {
         const videoErrorAlert = document.getElementById("video_error")
         let miliseconds;
         switch (errorCode) {
@@ -472,49 +463,42 @@ class Display {
         setTimeout(function () {
             Display.HideVideoError();
         }, miliseconds);
-    }
-    static HideVideoError() {
+    },
+    HideVideoError() {
         document.getElementById("video_error").classList.add("hidden")
-    }
-
-    static ClearLinkLabel() {
+    },
+    ClearLinkLabel() {
         document.getElementById("link_label").value = "";
-    }
-
-    static HidePlayer() {
+    },
+    HidePlayer() {
         document.getElementById("player").classList.add("hidden")
-    }
-    static ShowPlayer() {
+    },
+    ShowPlayer() {
         document.getElementById("player").classList.remove("hidden")
-    }
-
-    static ToggleVideo() {
+    },
+    ToggleVideo() {
         document.getElementById("player").classList.toggle("hidden");
         Buttons.UpdateHideButton();
-    }
-
-    static ShowOvertimeDisplay() {
+    },
+    ShowOvertimeDisplay() {
         document.getElementById("display_div").classList.add("overtimed");
-    }
-    static HideOvertimeDisplay() {
+    },
+    HideOvertimeDisplay() {
         document.getElementById("display_div").classList.remove("overtimed");
-    }
-    static HasDisplayOvertime() {
+    },
+    HasDisplayOvertime() {
         return document.getElementById("display_div").classList.contains("overtimed")
-    }
-
-    static ShowNegativeSign() {
+    },
+    ShowNegativeSign() {
         document.getElementById("display_negative").classList.remove("hidden");
-    }
-    static HideNegativeSign() {
+    },
+    HideNegativeSign() {
         document.getElementById("display_negative").classList.add("hidden");
-    }
-
-    static GetLinkLabelValue() {
+    },
+    GetLinkLabelValue() {
         return document.getElementById("link_label").value;
-    }
-
-    static UpdateSavedSongsTable() {
+    },
+    UpdateSavedSongsTable() {
         let tableBody = document.getElementById("saves_table_body");
         let savedSongs = SongStorage.Read();
 
@@ -523,6 +507,8 @@ class Display {
         hideTableIfSaveEmpty();
 
         createNewTable();
+
+        Display.UpdatePlayingNow();
 
         function hideTableIfSaveEmpty() {
             if (SongStorage.IsEmpty()) {
@@ -641,24 +627,27 @@ class Display {
 
             }
         }
-    }
-
-    static HideSavesTable() {
+    },
+    HideSavesTable() {
         document.getElementById("saves_table_div").classList.add("hidden");
-    }
-    static ShowSavesTable() {
+    },
+    ShowSavesTable() {
         document.getElementById("saves_table_div").classList.remove("hidden");
-    }
-
-    static SetPlayingNow(index) {
+    },
+    UpdatePlayingNow() {
+        if (!Queue.IsEnabled) {
+            return;
+        }
+        Display.SetPlayingNow(Queue.Index);
+    },
+    SetPlayingNow(index) {
         let tableRows = document.getElementById("saves_table_body").children;
 
         Display.ClearPlayingNow(tableRows);
 
         tableRows[index].classList.add("playing-now")
-    }
-
-    static ClearPlayingNow() {
+    },
+    ClearPlayingNow() {
         let tableRows = document.getElementById("saves_table_body").children;
         for (let i = 0; i < tableRows.length; i++) {
             const element = tableRows[i];
@@ -667,15 +656,14 @@ class Display {
     }
 }
 
-class Video {
-    static LoadIframeAPI() {
+const Video = {
+    LoadIframeAPI() {
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-
-    static CreatePlayer() {
+    },
+    CreatePlayer() {
         Player = new YT.Player('player', {
             height: '360',
             width: '640',
@@ -689,28 +677,25 @@ class Video {
                 }
             }
         });
-    }
-
-    static OnPlayerStateChange(playerState) {
+    },
+    OnPlayerStateChange(playerState) {
         if (playerState == YT.PlayerState.ENDED) {
             Queue.Next();
         }
-    }
-
-    static PlayVideo() {
+    },
+    PlayVideo() {
         Player.playVideo();
-    }
-    static StopVideo() {
+    },
+    StopVideo() {
         Player.stopVideo();
-    }
-    static PauseVideo() {
+    },
+    PauseVideo() {
         Player.pauseVideo();
-    }
-    static IsMuted() {
+    },
+    IsMuted() {
         return Player.isMuted();
-    }
-
-    static ToggleMute() {
+    },
+    ToggleMute() {
         if (Video.IsMuted()) {
             Player.unMute();
         } else {
@@ -719,22 +704,20 @@ class Video {
         Buttons.UpdateMuteButton()
 
 
-    }
-    static HasVideoBeenSet() {
+    },
+    HasVideoBeenSet() {
         return !(Player.getVideoUrl() === 'https://www.youtube.com/watch');
-    }
-
-    static SetVideoWithoutQueue(link) {
+    },
+    SetVideoWithoutQueue(link) {
         Queue.Disable();
         link === undefined ? Video.SetVideo() : Video.SetVideo(link);
         Buttons.UpdateSaveButton();
-    }
-    static SetVideoWithQueue(link, index) {
+    },
+    SetVideoWithQueue(link, index) {
         Video.SetVideoWithoutQueue(link)
         index === undefined ? Queue.Enable() : Queue.Enable(index);
-    }
-
-    static SetVideo(link = Display.GetLinkLabelValue()) {
+    },
+    SetVideo(link = Display.GetLinkLabelValue()) {
 
         Queue.LastSong = link;
 
@@ -777,9 +760,8 @@ class Video {
         Buttons.UpdateHideButton();
         Buttons.UpdateMuteButton();
 
-    }
-
-    static getVideoType(link) {
+    },
+    getVideoType(link) {
         if (link.match("https:\/\/(www\.)*youtu.*")) {
             if (link.includes("index") || link.includes("playlist?")) {
                 return "playlist";
@@ -789,9 +771,8 @@ class Video {
             }
         }
         return "invalid";
-    }
-
-    static getVideoId(link, type) {
+    },
+    getVideoId(link, type) {
         const typeBehaviour = {
             "single": () => {
                 if (link.includes("watch?")) {
@@ -816,62 +797,45 @@ class Video {
         } catch (error) {
             return;
         }
-    }
-
-    static getVideoIndex(link, type) {
+    },
+    getVideoIndex(link, type) {
         if (type === 'playlist' && link.includes("index")) {
             return parseInt(link.split("index=").pop()) - 1;
         }
 
         return 0;
-    }
-
-    static VideoErrorHandler(errorCode) {
+    },
+    VideoErrorHandler(errorCode) {
         Display.ShowVideoError(errorCode);
         Queue.Next();
-    }
-
-    static ClearVideo() {
+    },
+    ClearVideo() {
         Player.stopVideo();
         Player.loadVideoById("000");
         Display.HidePlayer();
     }
 }
 
-class Sounds {
-    static LoadAlarm() {
-        Alarm = new Audio('./assets/audio/ringtone.mp3');
-    }
-
-    static PlayAlarm() {
-        Alarm.play();
-    }
-}
-
-class SongStorage {
-
-    static Create() {
+const SongStorage = {
+    Create() {
         if (localStorage.savedSongs == null) {
             localStorage.savedSongs = "";
         }
-    }
-
-    static Read() {
+    },
+    Read() {
         let result = localStorage.savedSongs.split(SAVE_SEPARATOR);
         result.pop();
 
         return result;
-    }
-
-    static Load() {
+    },
+    Load() {
         if (SongStorage.IsEmpty()) {
             return;
         }
         let savedSongs = SongStorage.Read();
         Video.SetVideoWithQueue(savedSongs[0])
-    }
-
-    static Save(song = Display.GetLinkLabelValue() == "" ? Queue.LastSong : Display.GetLinkLabelValue()) {
+    },
+    Save(song = Display.GetLinkLabelValue() == "" ? Queue.LastSong : Display.GetLinkLabelValue()) {
 
         const saveBehaviours = {
             'object': () => {
@@ -890,9 +854,8 @@ class SongStorage {
         }
 
         Display.UpdateSavedSongsTable();
-    }
-
-    static Delete(el) {
+    },
+    Delete(el) {
         if (el === undefined) {
             if (!confirm("Delete all saved songs?")) {
                 return;
@@ -917,17 +880,23 @@ class SongStorage {
             SongStorage.Save(savedSongs);
         }
 
-    }
-
-    static IsEmpty() {
+    },
+    IsEmpty() {
         return SongStorage.Read().length == 0
     }
-
-
 }
 
-class Help {
-    static ToggleHelp() {
+const Sounds = {
+    LoadAlarm() {
+        Alarm = new Audio('./assets/audio/ringtone.mp3');
+    },
+    PlayAlarm() {
+        Alarm.play();
+    }
+}
+
+const Help = {
+    ToggleHelp() {
         document.getElementById("help_text").classList.toggle("hidden");
     }
 }
