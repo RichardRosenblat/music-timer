@@ -186,65 +186,65 @@ class Input {
     static RecieveInput(e) {
         const keyboardShortcuts = {
             "ArrowRight": () => {
-                Time.AlterSeconds(30)
+                document.getElementById("atb_+30s").click();
             },
             "ArrowLeft": () => {
-                Time.AlterSeconds(-30)
+                document.getElementById("atb_-30s").click();
             },
             "ArrowUp": () => {
-                Time.AlterMinutes(1)
+                document.getElementById("atb_+1m").click();
             },
             "ArrowDown": () => {
-                Time.AlterMinutes(-1)
+                document.getElementById("atb_-1m").click();
             },
             "PageUp": () => {
-                Time.AlterMinutes(5)
+                document.getElementById("atb_+5m").click();
             },
             "PageDown": () => {
-                Time.AlterMinutes(-5)
+                document.getElementById("atb_-5m").click();
             },
             "Home": () => {
-                Time.AlterMinutes(10)
+                document.getElementById("atb_+10m").click();
             },
             "End": () => {
-                Time.AlterMinutes(-10)
+                document.getElementById("atb_-10m").click();
             },
             "Enter": () => {
-                States.CycleStates()
+                document.getElementById("start").click();
             },
             "Delete": () => {
-                States.ChangeStatesTo("idle")
-            },
-            " ": () => {
-                States.CycleStates()
+                document.getElementById("clear").click();
             },
 
             "d": () => {
-                Time.AlterSeconds(30)
+                keyboardShortcuts.ArrowRight();
             },
             "a": () => {
-                Time.AlterSeconds(-30)
+                keyboardShortcuts.ArrowLeft();
             },
             "w": () => {
-                Time.AlterMinutes(1)
+                keyboardShortcuts.ArrowUp();
             },
             "s": () => {
-                Time.AlterMinutes(-1)
+                keyboardShortcuts.ArrowDown();
             },
             "e": () => {
-                Time.AlterMinutes(5)
+                keyboardShortcuts.PageUp();
             },
             "q": () => {
-                Time.AlterMinutes(-5)
+                keyboardShortcuts.PageDown();
             },
             "r": () => {
-                Time.AlterMinutes(10)
+                keyboardShortcuts.Home();
             },
             "f": () => {
-                Time.AlterMinutes(-10)
+                keyboardShortcuts.End();
+            },
+            " ": () => {
+                keyboardShortcuts.Enter();
             },
             "Escape": () => {
-                States.ChangeStatesTo("idle")
+                keyboardShortcuts.Delete();
             },
         };
 
