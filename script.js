@@ -6,7 +6,7 @@ function onYouTubeIframeAPIReady() {
 }
 
 const Application = {
-    Load: () => {
+    Load() {
         SongStorage.Create();
         Sounds.LoadAlarm();
         Video.LoadIframeAPI();
@@ -16,7 +16,7 @@ const Application = {
 
 const States = {
     ApplicationState: "idle",
-    ChangeStatesTo: (state) => {
+    ChangeStatesTo(state) {
 
         const StatesChangeActions = {
             "idle": function () {
@@ -63,7 +63,7 @@ const States = {
         Buttons.BlurButtons();
         Display.Timer.UpdateDisplays();
     },
-    CycleStates: () => {
+    CycleStates() {
         const stateChange = {
             "idle": function () {
                 States.ChangeStatesTo("playing");
@@ -87,29 +87,29 @@ const States = {
 }
 
 const Buttons = {
-    SetStartButton: () => {
+    SetStartButton() {
         document.getElementById("start").innerHTML = "Start";
         document.getElementById("start").classList.add("btn-primary");
         document.getElementById("start").classList.remove("btn-success");
         document.getElementById("start").classList.remove("btn-secondary");
     },
-    SetResumeButton: () => {
+    SetResumeButton() {
         document.getElementById("start").innerHTML = "Resume";
         document.getElementById("start").classList.remove("btn-primary");
         document.getElementById("start").classList.add("btn-success");
         document.getElementById("start").classList.remove("btn-secondary");
     },
-    SetPauseButton: () => {
+    SetPauseButton() {
         document.getElementById("start").innerHTML = "Pause";
         document.getElementById("start").classList.remove("btn-primary");
         document.getElementById("start").classList.remove("btn-success");
         document.getElementById("start").classList.add("btn-secondary");
     },
-    BlurButtons: () => {
+    BlurButtons() {
         document.getElementById("start").blur();
         document.getElementById("clear").blur();
     },
-    UpdateHideButton: () => {
+    UpdateHideButton() {
         if (Video.HasVideoBeenSet()) {
             document.getElementById("hide_show_button").disabled = false;
         }
@@ -119,7 +119,7 @@ const Buttons = {
         }
         document.getElementById("hide_show_img").src = "./assets/images/hide.png";
     },
-    UpdateMuteButton: () => {
+    UpdateMuteButton() {
         if (Video.HasVideoBeenSet()) {
             document.getElementById("mute_sound_button").disabled = false;
         }
@@ -129,7 +129,7 @@ const Buttons = {
         }
         document.getElementById("mute_sound_img").src = "./assets/images/mute.png";
     },
-    UpdateSaveButton: () => {
+    UpdateSaveButton() {
         let linkLabel = document.getElementById("link_label");
         let saveButton = document.getElementById("save_button");
 
@@ -140,13 +140,13 @@ const Buttons = {
 
         saveButton.disabled = false;
     },
-    OpenSongLink: (el) => {
+    OpenSongLink(el) {
         window.open(el.innerHTML, '_blank')
     }
 }
 
 const Input = {
-    RecieveInput: (e) => {
+    RecieveInput(e) {
         const keyboardShortcuts = {
             "ArrowRight": () => {
                 document.getElementById("atb_+30s").click();
@@ -291,10 +291,10 @@ const Input = {
 const Time = {
     TimerId: 0,
     RemainingTime: 0,
-    AlterMinutes: (value) => {
+    AlterMinutes(value) {
         Time.AlterSeconds(value * 60);
     },
-    AlterSeconds: (value) => {
+    AlterSeconds(value) {
         if (Time.IsTimerOvertimed()) {
             if (Time.RemainingTime - value <= 0) {
                 Time.RemainingTime = (Time.RemainingTime - value) * -1;
@@ -311,7 +311,7 @@ const Time = {
         }
         Display.Timer.UpdateDisplays();
     },
-    StartTimer: () => {
+    StartTimer() {
         Time.TimerId = setInterval(() => {
             if (States.ApplicationState != "overtimed" && --Time.RemainingTime <= 0) {
                 Time.ClearTimer();
@@ -322,13 +322,13 @@ const Time = {
             Display.Timer.UpdateDisplays();
         }, 1000);
     },
-    StopTimer: () => {
+    StopTimer() {
         clearInterval(Time.TimerId);
     },
-    ClearTimer: () => {
+    ClearTimer() {
         Time.RemainingTime = 0;
     },
-    IsTimerOvertimed: () => {
+    IsTimerOvertimed() {
         return Display.OvertimeDisplay.isActive();
     }
 }
