@@ -19,18 +19,18 @@ const States = {
     ChangeStatesTo(state) {
 
         const StatesChangeActions = {
-            "idle": function () {
+            "idle": () => {
                 Buttons.SetStartButton();
                 Display.Timer.Lock.Unlock();
                 Time.StopTimer();
-                Time.ClearTimer();
+                Time.ClearTime();
                 Display.NegativeSign.Hide();
                 Video.PauseVideo();
                 Display.PageTitle.Reset();
                 Display.OvertimeDisplay.Hide();
                 States.ApplicationState = "idle";
             },
-            "playing": function () {
+            "playing": () => {
                 Display.OvertimeDisplay.Hide();
                 Buttons.SetPauseButton();
                 Display.Timer.Lock.Lock();
@@ -40,7 +40,7 @@ const States = {
                 Video.PlayVideo();
                 States.ApplicationState = "playing";
             },
-            "overtimed": function () {
+            "overtimed": () => {
                 Buttons.SetPauseButton();
                 Display.Timer.Lock.Lock();
                 Time.StopTimer();
@@ -51,7 +51,7 @@ const States = {
                 Display.NegativeSign.Show();
                 States.ApplicationState = "overtimed";
             },
-            "paused": function () {
+            "paused": () => {
                 Buttons.SetResumeButton();
                 Display.Timer.Lock.Unlock();
                 Time.StopTimer();
@@ -60,21 +60,21 @@ const States = {
             }
         };
         StatesChangeActions[state]();
-        Buttons.BlurButtons();
+        Buttons.BlurMainButtons();
         Display.Timer.UpdateDisplays();
     },
     CycleStates() {
         const stateChange = {
-            "idle": function () {
+            "idle": () => {
                 States.ChangeStatesTo("playing");
             },
-            "playing": function () {
+            "playing": () => {
                 States.ChangeStatesTo("paused");
             },
-            "overtimed": function () {
+            "overtimed": () => {
                 States.ChangeStatesTo("paused");
             },
-            "paused": function () {
+            "paused": () => {
                 if (Time.IsTimerOvertimed()) {
                     States.ChangeStatesTo("overtimed");
                     return;
@@ -88,31 +88,35 @@ const States = {
 
 const Buttons = {
     SetStartButton() {
-        document.getElementById("start").innerHTML = "Start";
-        document.getElementById("start").classList.add("btn-primary");
-        document.getElementById("start").classList.remove("btn-success");
-        document.getElementById("start").classList.remove("btn-secondary");
+        let startButton = document.getElementById("start");
+
+        startButton.innerHTML = "Start";
+        startButton.classList.add("btn-primary");
+        startButton.classList.remove("btn-success");
+        startButton.classList.remove("btn-secondary");
     },
     SetResumeButton() {
-        document.getElementById("start").innerHTML = "Resume";
-        document.getElementById("start").classList.remove("btn-primary");
-        document.getElementById("start").classList.add("btn-success");
-        document.getElementById("start").classList.remove("btn-secondary");
+        let startButton = document.getElementById("start");
+
+        startButton.innerHTML = "Resume";
+        startButton.classList.remove("btn-primary");
+        startButton.classList.add("btn-success");
+        startButton.classList.remove("btn-secondary");
     },
     SetPauseButton() {
-        document.getElementById("start").innerHTML = "Pause";
-        document.getElementById("start").classList.remove("btn-primary");
-        document.getElementById("start").classList.remove("btn-success");
-        document.getElementById("start").classList.add("btn-secondary");
+        let startButton = document.getElementById("start");
+
+        startButton.innerHTML = "Pause";
+        startButton.classList.remove("btn-primary");
+        startButton.classList.remove("btn-success");
+        startButton.classList.add("btn-secondary");
     },
-    BlurButtons() {
+    BlurMainButtons() {
         document.getElementById("start").blur();
         document.getElementById("clear").blur();
     },
     UpdateHideButton() {
-        if (Video.HasVideoBeenSet()) {
-            document.getElementById("hide_show_button").disabled = false;
-        }
+        document.getElementById("hide_show_button").disabled = !Video.HasVideoBeenSet();
         if (document.getElementById("player").classList.contains("hidden")) {
             document.getElementById("hide_show_img").src = "./assets/images/show.png";
             return;
@@ -120,10 +124,8 @@ const Buttons = {
         document.getElementById("hide_show_img").src = "./assets/images/hide.png";
     },
     UpdateMuteButton() {
-        if (Video.HasVideoBeenSet()) {
-            document.getElementById("mute_sound_button").disabled = false;
-        }
-        if (!(Video.IsMuted() || Video.IsMuted() === undefined)) {
+        document.getElementById("mute_sound_button").disabled = !Video.HasVideoBeenSet();
+        if (!(Video.IsMuted() === undefined || Video.IsMuted())) {
             document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
             return;
         }
@@ -133,12 +135,7 @@ const Buttons = {
         let linkLabel = document.getElementById("link_label");
         let saveButton = document.getElementById("save_button");
 
-        if (linkLabel.value == "" && SongStorage.Queue.LastSong == "") {
-            saveButton.disabled = true;
-            return;
-        }
-
-        saveButton.disabled = false;
+        saveButton.disabled = linkLabel.value == "" && SongStorage.Queue.LastSong == "";
     },
     OpenSongLink(el) {
         window.open(el.innerHTML, '_blank')
@@ -225,14 +222,14 @@ const Input = {
             e.preventDefault();
             return;
         } catch (err) {
+            if (Display.Timer.Lock.IsLocked()) {
+                return;
+            }
             recieveKeyboardInput(key);
         }
 
 
         function recieveKeyboardInput(key) {
-            if (Display.Timer.Lock.IsLocked()) {
-                return;
-            }
 
             let hours = document.getElementById("display_hours").innerHTML;
             let minutes = document.getElementById("display_minutes").innerHTML;
@@ -243,9 +240,9 @@ const Input = {
             let display_array = Array.from(hours + minutes + seconds);
 
             if (key == "Backspace") {
-                removeNumber();
+                removeNumber(display_array);
             } else if (!isNaN(key)) {
-                addNumber();
+                addNumber(display_array, key);
             } else {
                 return;
             }
@@ -261,7 +258,7 @@ const Input = {
 
             setRemainingTime(hours, minutes, seconds);
 
-            function addNumber() {
+            function addNumber(display_array, key) {
 
                 display_array.push(key);
 
@@ -273,7 +270,7 @@ const Input = {
                 hoursLen++;
             }
 
-            function removeNumber() {
+            function removeNumber(display_array) {
                 display_array.unshift("0");
                 display_array.pop();
             }
@@ -314,7 +311,7 @@ const Time = {
     StartTimer() {
         Time.TimerId = setInterval(() => {
             if (States.ApplicationState != "overtimed" && --Time.RemainingTime <= 0) {
-                Time.ClearTimer();
+                Time.ClearTime();
                 States.ChangeStatesTo("overtimed");
             } else if (States.ApplicationState == "overtimed") {
                 Time.RemainingTime++;
@@ -325,7 +322,7 @@ const Time = {
     StopTimer() {
         clearInterval(Time.TimerId);
     },
-    ClearTimer() {
+    ClearTime() {
         Time.RemainingTime = 0;
     },
     IsTimerOvertimed() {
