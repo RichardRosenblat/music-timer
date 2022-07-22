@@ -342,37 +342,29 @@ const Display = {
             let minutes = parseInt((Time.RemainingTime / 60) % 60, 10);
             let seconds = parseInt(Time.RemainingTime % 60, 10);
 
-            const display_secret = document.getElementById("display_secret");
-
             const display_hours = document.getElementById("display_hours");
             const display_minutes = document.getElementById("display_minutes");
             const display_seconds = document.getElementById("display_seconds");
 
             if (hours != 0) {
-                showHour_display();
+                Display.Timer.showHour();
             } else {
-                hideHour_display();
+                Display.Timer.hideHour();
             }
 
-            updatePageDisplay();
+            display_hours.innerHTML = hours < 10 ? "0" + hours : hours;
+            display_minutes.innerHTML = minutes < 10 ? "0" + minutes : minutes;
+            display_seconds.innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
             Display.PageTitle.Update()
-
-            function hideHour_display() {
-                display_hours.classList.add("hidden");
-                display_secret.classList.add("hidden");
-            }
-
-            function showHour_display() {
-                display_secret.classList.remove("hidden");
-                display_hours.classList.remove("hidden");
-            }
-
-            function updatePageDisplay() {
-                display_hours.innerHTML = hours < 10 ? "0" + hours : hours;
-                display_minutes.innerHTML = minutes < 10 ? "0" + minutes : minutes;
-                display_seconds.innerHTML = seconds < 10 ? "0" + seconds : seconds;
-            }
-
+        },
+        hideHour() {
+            document.getElementById("display_hours").classList.add("hidden");
+            document.getElementById("display_secret").classList.add("hidden");
+        },
+        showHour() {
+            document.getElementById("display_secret").classList.remove("hidden");
+            document.getElementById("display_hours").classList.remove("hidden");
         },
         Lock: {
             Unlock() {
@@ -390,14 +382,16 @@ const Display = {
     },
     PageTitle: {
         Update() {
+            if (States.ApplicationState == 'idle') {
+                return;
+            }
+
             let hours = parseInt(Time.RemainingTime / 3600, 10);
+
             const display_hours = document.getElementById("display_hours");
             const display_minutes = document.getElementById("display_minutes");
             const display_seconds = document.getElementById("display_seconds");
 
-            if (States.ApplicationState == 'idle') {
-                return;
-            }
             let newTitle = "Music Timer (" +
                 (Time.IsTimerOvertimed() ? "-" : "") +
                 (hours <= 0 ? "" : display_hours.innerHTML + ":") +
@@ -413,33 +407,39 @@ const Display = {
     VideoError: {
         Show(errorCode) {
             const videoErrorAlert = document.getElementById("video_error")
-            let miliseconds;
+
+            const videoErrorInfo = {
+                message: "",
+                miliseconds: 0
+            }
+
             switch (errorCode) {
                 case 150:
                 case 101:
-                    videoErrorAlert.innerHTML = "The owner of the video does not allow it to be embedded!"
-                    miliseconds = 9000
+                    videoErrorInfo.message = "The owner of the video does not allow it to be embedded!"
+                    videoErrorInfo.miliseconds = 9000
                     break;
                 case 100:
-                    videoErrorAlert.innerHTML = "Video not found!"
-                    miliseconds = 5000
+                    videoErrorInfo.message = "Video not found!"
+                    videoErrorInfo.miliseconds = 5000
                     break;
                 case 5:
-                    videoErrorAlert.innerHTML = "This video cannot be played on website players!"
-                    miliseconds = 9000
+                    videoErrorInfo.message = "This video cannot be played on website players!"
+                    videoErrorInfo.miliseconds = 9000
                     break;
                 case 2:
                     return;
                 default:
-                    videoErrorAlert.innerHTML = "Invalid youtube video!"
-                    miliseconds = 5000
+                    videoErrorInfo.message = "Invalid youtube video!"
+                    videoErrorInfo.miliseconds = 5000
                     break;
             }
 
+            videoErrorAlert.innerHTML = videoErrorInfo.message
             videoErrorAlert.classList.remove("hidden")
             setTimeout(function () {
                 Display.VideoError.Hide();
-            }, miliseconds);
+            }, videoErrorInfo.miliseconds);
         },
         Hide() {
             document.getElementById("video_error").classList.add("hidden")
