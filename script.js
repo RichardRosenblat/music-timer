@@ -456,7 +456,7 @@ const Display = {
             document.getElementById("player").classList.toggle("hidden");
             Buttons.UpdateHideButton();
         },
-        IsHidden(){
+        IsHidden() {
             return document.getElementById("player").classList.contains("hidden") && document.getElementById("hide_show_button").disabled === false;
         }
     },
@@ -495,7 +495,7 @@ const Display = {
             if (hideTableIfSaveEmpty()) {
                 return;
             }
-            
+
             deletePreviousTable();
 
             createNewTable();
@@ -674,7 +674,7 @@ const Video = {
                 'onError': (event) => {
                     console.log(event.data);
                     Video.PlayerErrorHandler(event.data);
-                }                
+                }
             }
         });
     },
