@@ -489,20 +489,26 @@ const Display = {
             let tableBody = document.getElementById("saves_table_body");
             let savedSongs = SongStorage.Read();
 
+            if (hideTableIfSaveEmpty()) {
+                return;
+            }
+            
             deletePreviousTable();
-
-            hideTableIfSaveEmpty();
 
             createNewTable();
 
             Display.PlayingNow.Update();
 
             function hideTableIfSaveEmpty() {
-                if (SongStorage.IsEmpty()) {
+                let isEmpty = SongStorage.IsEmpty();
+
+                if (isEmpty) {
                     Display.SavedSongsTable.Hide();
                 } else {
                     Display.SavedSongsTable.Show();
                 }
+
+                return isEmpty;
             }
 
             function deletePreviousTable() {
@@ -647,7 +653,7 @@ const Display = {
 }
 
 const Video = {
-    Player: undefined,
+    Player: {},
     LoadIframeAPI() {
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -659,20 +665,24 @@ const Video = {
             height: '360',
             width: '640',
             events: {
+                'onStateChange': (event) => {
+                    Video.PlayerStateChangeHandler(event.data)
+                },
                 'onError': (event) => {
                     console.log(event.data);
-                    Video.VideoErrorHandler(event.data);
-                },
-                'onStateChange': (event) => {
-                    Video.OnPlayerStateChange(event.data)
-                }
+                    Video.PlayerErrorHandler(event.data);
+                }                
             }
         });
     },
-    OnPlayerStateChange(playerState) {
+    PlayerStateChangeHandler(playerState) {
         if (playerState == YT.PlayerState.ENDED) {
             SongStorage.Queue.Next();
         }
+    },
+    PlayerErrorHandler(errorCode) {
+        Display.VideoError.Show(errorCode);
+        SongStorage.Queue.Next();
     },
     PlayVideo() {
         Video.Player.playVideo();
@@ -693,8 +703,6 @@ const Video = {
             Video.Player.mute();
         }
         Buttons.UpdateMuteButton()
-
-
     },
     HasVideoBeenSet() {
         return !(Video.Player.getVideoUrl() === 'https://www.youtube.com/watch');
@@ -732,13 +740,21 @@ const Video = {
                 Display.VideoError.Hide();
             },
             "invalid": () => {
-                Video.VideoErrorHandler(0);
+                Video.PlayerErrorHandler(0);
             }
         }
 
         linkTypeBehaviours[linkType]();
 
         if (!SongStorage.Queue.IsEnabled) {
+            StopVideoAfterLoading()
+        }
+
+        Display.LinkLabel.Clear();
+        Buttons.UpdateHideButton();
+        Buttons.UpdateMuteButton();
+
+        function StopVideoAfterLoading() {
             let videoStateChecker = setInterval(() => {
                 if (States.ApplicationState != 'playing' && Video.Player.getPlayerState() === YT.PlayerState.PLAYING) {
                     Video.StopVideo();
@@ -746,11 +762,6 @@ const Video = {
                 }
             }, 10);
         }
-
-        Display.LinkLabel.Clear();
-        Buttons.UpdateHideButton();
-        Buttons.UpdateMuteButton();
-
     },
     getVideoType(link) {
         if (link.match("https:\/\/(www\.)*youtu.*")) {
@@ -795,15 +806,6 @@ const Video = {
         }
 
         return 0;
-    },
-    VideoErrorHandler(errorCode) {
-        Display.VideoError.Show(errorCode);
-        SongStorage.Queue.Next();
-    },
-    ClearVideo() {
-        Video.Player.stopVideo();
-        Video.Player.loadVideoById("000");
-        Display.VideoPlayer.Hide();
     }
 }
 
