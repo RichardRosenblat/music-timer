@@ -116,7 +116,7 @@ const Buttons = {
         document.getElementById("clear").blur();
     },
     UpdateHideButton() {
-        document.getElementById("hide_show_button").disabled = !Video.HasVideoBeenSet();
+        document.getElementById("hide_show_button").disabled = Video.HasVideoBeenSet();
         if (document.getElementById("player").classList.contains("hidden")) {
             document.getElementById("hide_show_img").src = "./assets/images/show.png";
             return;
@@ -124,7 +124,7 @@ const Buttons = {
         document.getElementById("hide_show_img").src = "./assets/images/hide.png";
     },
     UpdateMuteButton() {
-        document.getElementById("mute_sound_button").disabled = !Video.HasVideoBeenSet();
+        document.getElementById("mute_sound_button").disabled = Video.HasVideoBeenSet();
         if (!(Video.IsMuted() === undefined || Video.IsMuted())) {
             document.getElementById("mute_sound_img").src = "./assets/images/volume.png";
             return;
@@ -138,7 +138,7 @@ const Buttons = {
         saveButton.disabled = linkLabel.value == "" && SongStorage.Queue.LastSong == "";
     },
     OpenSongLink(el) {
-        window.open(el.innerHTML, '_blank')
+        window.open(el.innerHTML, '_blank');
     }
 }
 
@@ -356,7 +356,7 @@ const Display = {
             display_minutes.innerHTML = minutes < 10 ? "0" + minutes : minutes;
             display_seconds.innerHTML = seconds < 10 ? "0" + seconds : seconds;
 
-            Display.PageTitle.Update()
+            Display.PageTitle.Update();
         },
         hideHour() {
             document.getElementById("display_hours").classList.add("hidden");
@@ -416,46 +416,49 @@ const Display = {
             switch (errorCode) {
                 case 150:
                 case 101:
-                    videoErrorInfo.message = "The owner of the video does not allow it to be embedded!"
-                    videoErrorInfo.miliseconds = 9000
+                    videoErrorInfo.message = "The owner of the video does not allow it to be embedded!";
+                    videoErrorInfo.miliseconds = 9000;
                     break;
                 case 100:
-                    videoErrorInfo.message = "Video not found!"
-                    videoErrorInfo.miliseconds = 5000
+                    videoErrorInfo.message = "Video not found!";
+                    videoErrorInfo.miliseconds = 5000;
                     break;
                 case 5:
-                    videoErrorInfo.message = "This video cannot be played on website players!"
-                    videoErrorInfo.miliseconds = 9000
+                    videoErrorInfo.message = "This video cannot be played on website players!";
+                    videoErrorInfo.miliseconds = 9000;
                     break;
                 case 2:
                     return;
                 default:
-                    videoErrorInfo.message = "Invalid youtube video!"
-                    videoErrorInfo.miliseconds = 5000
+                    videoErrorInfo.message = "Invalid youtube video!";
+                    videoErrorInfo.miliseconds = 5000;
                     break;
             }
 
-            videoErrorAlert.innerHTML = videoErrorInfo.message
-            videoErrorAlert.classList.remove("hidden")
+            videoErrorAlert.innerHTML = videoErrorInfo.message;
+            videoErrorAlert.classList.remove("hidden");
             setTimeout(function () {
                 Display.VideoError.Hide();
             }, videoErrorInfo.miliseconds);
         },
         Hide() {
-            document.getElementById("video_error").classList.add("hidden")
+            document.getElementById("video_error").classList.add("hidden");
         },
     },
     VideoPlayer: {
         Hide() {
-            document.getElementById("player").classList.add("hidden")
+            document.getElementById("player").classList.add("hidden");
         },
         Show() {
-            document.getElementById("player").classList.remove("hidden")
+            document.getElementById("player").classList.remove("hidden");
         },
         Toggle() {
             document.getElementById("player").classList.toggle("hidden");
             Buttons.UpdateHideButton();
         },
+        IsHidden(){
+            return document.getElementById("player").classList.contains("hidden") && document.getElementById("hide_show_button").disabled === false;
+        }
     },
     OvertimeDisplay: {
         Show() {
@@ -666,7 +669,7 @@ const Video = {
             width: '640',
             events: {
                 'onStateChange': (event) => {
-                    Video.PlayerStateChangeHandler(event.data)
+                    Video.PlayerStateChangeHandler(event.data);
                 },
                 'onError': (event) => {
                     console.log(event.data);
@@ -702,10 +705,10 @@ const Video = {
         } else {
             Video.Player.mute();
         }
-        Buttons.UpdateMuteButton()
+        Buttons.UpdateMuteButton();
     },
     HasVideoBeenSet() {
-        return !(Video.Player.getVideoUrl() === 'https://www.youtube.com/watch');
+        return SongStorage.Queue.LastSong == "";
     },
     SetVideoWithoutQueue(link) {
         SongStorage.Queue.Disable();
@@ -713,7 +716,7 @@ const Video = {
         Buttons.UpdateSaveButton();
     },
     SetVideoWithQueue(link, index) {
-        Video.SetVideoWithoutQueue(link)
+        Video.SetVideoWithoutQueue(link);
         index === undefined ? SongStorage.Queue.Enable() : SongStorage.Queue.Enable(index);
     },
     SetVideo(link = Display.LinkLabel.GetValue()) {
@@ -726,12 +729,16 @@ const Video = {
 
         const linkTypeBehaviours = {
             "single": () => {
-                Display.VideoPlayer.Show();
+                if (!Display.VideoPlayer.IsHidden()) {
+                    Display.VideoPlayer.Show();
+                }
                 Video.Player.loadVideoById(id);
-                Display.VideoError.Hide()
+                Display.VideoError.Hide();
             },
             "playlist": () => {
-                Display.VideoPlayer.Show();
+                if (!Display.VideoPlayer.IsHidden()) {
+                    Display.VideoPlayer.Show();
+                }
                 Video.Player.loadPlaylist({
                     list: id,
                     listType: "playlist",
@@ -747,7 +754,7 @@ const Video = {
         linkTypeBehaviours[linkType]();
 
         if (!SongStorage.Queue.IsEnabled) {
-            StopVideoAfterLoading()
+            StopVideoAfterLoading();
         }
 
         Display.LinkLabel.Clear();
@@ -836,7 +843,7 @@ const SongStorage = {
                 return;
             }
             Display.PlayingNow.Update();
-            Video.SetVideo(savedSongs[SongStorage.Queue.Index])
+            Video.SetVideo(savedSongs[SongStorage.Queue.Index]);
         }
     },
     Create() {
@@ -855,7 +862,7 @@ const SongStorage = {
             return;
         }
         let savedSongs = SongStorage.Read();
-        Video.SetVideoWithQueue(savedSongs[0])
+        Video.SetVideoWithQueue(savedSongs[0]);
     },
     Save(song = Display.LinkLabel.GetValue() == "" ? SongStorage.Queue.LastSong : Display.LinkLabel.GetValue()) {
 
@@ -897,19 +904,19 @@ const SongStorage = {
                 SongStorage.Queue.Index--;
             }
 
-            savedSongs.splice(itemIndex, 1)
+            savedSongs.splice(itemIndex, 1);
 
             SongStorage.Save(savedSongs);
         }
 
     },
     IsEmpty() {
-        return SongStorage.Read().length == 0
+        return SongStorage.Read().length == 0;
     }
 }
 
 const Sounds = {
-    Alarm: undefined,
+    Alarm: {},
     LoadAlarm() {
         Sounds.Alarm = new Audio('./assets/audio/ringtone.mp3');
     },
