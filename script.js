@@ -15,11 +15,14 @@ const Application = {
 }
 
 const States = {
-    ApplicationState: "idle",
+    appState: "idle",
+    get ApplicationState() {
+        return this.appState;
+    },
     ChangeStatesTo(state) {
 
         const StatesChangeActions = {
-            "idle": () => {
+            "idle": function ()  {
                 Buttons.SetStartButton();
                 Display.Timer.Lock.Unlock();
                 Time.StopTimer();
@@ -28,9 +31,10 @@ const States = {
                 Video.PauseVideo();
                 Display.PageTitle.Reset();
                 Display.OvertimeDisplay.Hide();
-                States.ApplicationState = "idle";
+                // States.ApplicationState = "idle";
+                this.applicationState = "idle";
             },
-            "playing": () => {
+            "playing": function ()  {
                 Display.OvertimeDisplay.Hide();
                 Buttons.SetPauseButton();
                 Display.Timer.Lock.Lock();
@@ -38,9 +42,10 @@ const States = {
                 Time.StartTimer();
                 Display.NegativeSign.Hide();
                 Video.PlayVideo();
-                States.ApplicationState = "playing";
+                // States.ApplicationState = "playing";
+                this.applicationState = "playing";
             },
-            "overtimed": () => {
+            "overtimed": function ()  {
                 Buttons.SetPauseButton();
                 Display.Timer.Lock.Lock();
                 Time.StopTimer();
@@ -49,14 +54,16 @@ const States = {
                 Sounds.PlayAlarm();
                 Display.OvertimeDisplay.Show();
                 Display.NegativeSign.Show();
-                States.ApplicationState = "overtimed";
+                // States.ApplicationState = "overtimed";
+                this.applicationState = "overtimed";
             },
-            "paused": () => {
+            "paused": function ()  {
                 Buttons.SetResumeButton();
                 Display.Timer.Lock.Unlock();
                 Time.StopTimer();
                 Video.PauseVideo();
-                States.ApplicationState = "paused";
+                // States.ApplicationState = "paused";
+                this.applicationState = "paused";
             }
         };
         StatesChangeActions[state]();
@@ -817,7 +824,7 @@ const Video = {
 }
 
 const SongStorage = {
-    SAVE_SEPARATOR: "###",
+    SaveSeparator: "###",
     Queue: {
         LastSong: "",
         IsEnabled: false,
@@ -852,7 +859,7 @@ const SongStorage = {
         }
     },
     Read() {
-        let result = localStorage.savedSongs.split(SongStorage.SAVE_SEPARATOR);
+        let result = localStorage.savedSongs.split(SongStorage.SaveSeparator);
         result.pop();
 
         return result;
@@ -869,10 +876,10 @@ const SongStorage = {
         const saveBehaviours = {
             'object': () => {
                 song.push("");
-                localStorage.savedSongs = song.join(SongStorage.SAVE_SEPARATOR);
+                localStorage.savedSongs = song.join(SongStorage.SaveSeparator);
             },
             'string': () => {
-                localStorage.savedSongs += song + SongStorage.SAVE_SEPARATOR;
+                localStorage.savedSongs += song + SongStorage.SaveSeparator;
             }
         };
 
