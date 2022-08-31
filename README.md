@@ -1,4 +1,6 @@
 # music-timer
+>Project in production: https://richard-music-timer.herokuapp.com/ 
+
 This meeting-focused application allows the user to set videos and play them for a given timeframe. 
 
 ![](https://img.shields.io/github/license/RichardRosenblat/music-timer?style=for-the-badge)
